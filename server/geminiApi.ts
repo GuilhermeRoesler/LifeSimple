@@ -6,33 +6,47 @@ import {
   EMAIL,
   PHONE_DISPLAY,
 } from '../src/constants/contact.ts';
+import {
+  MAX_BODY_BYTES,
+  validateChatPayload,
+} from './chatLimits.ts';
+import {
+  extractBearerToken,
+  getFirebaseProjectId,
+  verifyFirebaseIdToken,
+} from './firebaseAuth.ts';
 
-type ChatHistoryItem = { role: 'user' | 'model'; text: string };
-
-type RateBucket = { hits: number[]; };
+type RateBucket = { hits: number[] };
 
 const RATE_WINDOW_MS = 60_000;
 const RATE_MAX = 20;
 const buckets = new Map<string, RateBucket>();
 
+function trustProxy(): boolean {
+  const value = process.env.TRUST_PROXY?.trim().toLowerCase();
+  return value === '1' || value === 'true' || value === 'yes';
+}
+
 function getClientIp(req: IncomingMessage): string {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (typeof forwarded === 'string' && forwarded.length > 0) {
-    return forwarded.split(',')[0]!.trim();
+  if (trustProxy()) {
+    const forwarded = req.headers['x-forwarded-for'];
+    if (typeof forwarded === 'string' && forwarded.length > 0) {
+      return forwarded.split(',')[0]!.trim();
+    }
   }
   return req.socket.remoteAddress ?? 'unknown';
 }
 
-function isRateLimited(ip: string): boolean {
+function isRateLimited(key: string): boolean {
   const now = Date.now();
-  const bucket = buckets.get(ip) ?? { hits: [] };
+  const bucket = buckets.get(key) ?? { hits: [] };
   bucket.hits = bucket.hits.filter((t) => now - t < RATE_WINDOW_MS);
   if (bucket.hits.length >= RATE_MAX) {
-    buckets.set(ip, bucket);
+    buckets.set(key, bucket);
     return true;
   }
   bucket.hits.push(now);
-  buckets.set(ip, bucket);
+  buckets.set(key, bucket);
   return false;
 }
 
@@ -53,10 +67,31 @@ Produtos disponíveis: ${productNames}.
 Nunca mencione que é uma IA. Apresente-se como assistente virtual da Life Simple.`.trim();
 }
 
-async function readJsonBody(req: IncomingMessage): Promise<unknown> {
+class BodyTooLargeError extends Error {
+  constructor() {
+    super('BODY_TOO_LARGE');
+    this.name = 'BodyTooLargeError';
+  }
+}
+
+async function readJsonBody(req: IncomingMessage, maxBytes: number): Promise<unknown> {
+  const contentLength = req.headers['content-length'];
+  if (contentLength) {
+    const declared = Number(contentLength);
+    if (Number.isFinite(declared) && declared > maxBytes) {
+      throw new BodyTooLargeError();
+    }
+  }
+
   const chunks: Buffer[] = [];
+  let size = 0;
   for await (const chunk of req) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    size += buf.length;
+    if (size > maxBytes) {
+      throw new BodyTooLargeError();
+    }
+    chunks.push(buf);
   }
   const raw = Buffer.concat(chunks).toString('utf8');
   if (!raw) return {};
@@ -67,6 +102,10 @@ function sendJson(res: ServerResponse, status: number, body: unknown): void {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify(body));
+}
+
+function drainRequest(req: IncomingMessage): void {
+  req.resume();
 }
 
 export async function handleChatRequest(
@@ -82,46 +121,93 @@ export async function handleChatRequest(
   }
 
   if (req.method !== 'POST') {
+    drainRequest(req);
     sendJson(res, 405, { error: 'Método não permitido' });
     return;
   }
 
+  const contentLength = req.headers['content-length'];
+  if (contentLength) {
+    const declared = Number(contentLength);
+    if (Number.isFinite(declared) && declared > MAX_BODY_BYTES) {
+      drainRequest(req);
+      sendJson(res, 413, { error: 'Requisição muito grande.' });
+      return;
+    }
+  }
+
   const ip = getClientIp(req);
-  if (isRateLimited(ip)) {
+  if (isRateLimited(`ip:${ip}`)) {
+    drainRequest(req);
     sendJson(res, 429, { error: 'Muitas solicitações. Tente novamente em instantes.' });
     return;
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey.startsWith('YOUR_') || apiKey.includes('SUA_')) {
+  const projectId = getFirebaseProjectId();
+  if (!projectId) {
+    drainRequest(req);
     sendJson(res, 503, {
       error: 'Assistente indisponível no momento. Use o WhatsApp para falar conosco.',
     });
     return;
   }
 
-  let body: { message?: string; history?: ChatHistoryItem[] };
+  const token = extractBearerToken(req.headers.authorization);
+  if (!token) {
+    drainRequest(req);
+    sendJson(res, 401, { error: 'Autenticação necessária.' });
+    return;
+  }
+
+  let uid: string;
   try {
-    body = (await readJsonBody(req)) as typeof body;
-  } catch {
+    ({ uid } = await verifyFirebaseIdToken(token, projectId));
+  } catch (error) {
+    console.error('Firebase token verification failed:', error);
+    drainRequest(req);
+    sendJson(res, 401, { error: 'Sessão inválida ou expirada. Recarregue a página.' });
+    return;
+  }
+
+  if (isRateLimited(`uid:${uid}`)) {
+    drainRequest(req);
+    sendJson(res, 429, { error: 'Muitas solicitações. Tente novamente em instantes.' });
+    return;
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || apiKey.startsWith('YOUR_') || apiKey.includes('SUA_')) {
+    drainRequest(req);
+    sendJson(res, 503, {
+      error: 'Assistente indisponível no momento. Use o WhatsApp para falar conosco.',
+    });
+    return;
+  }
+
+  let rawBody: unknown;
+  try {
+    rawBody = await readJsonBody(req, MAX_BODY_BYTES);
+  } catch (error) {
+    if (error instanceof BodyTooLargeError) {
+      sendJson(res, 413, { error: 'Requisição muito grande.' });
+      return;
+    }
     sendJson(res, 400, { error: 'JSON inválido' });
     return;
   }
 
-  const message = body.message?.trim();
-  if (!message) {
-    sendJson(res, 400, { error: 'Mensagem obrigatória' });
+  const payload = validateChatPayload(rawBody);
+  if (!payload.ok) {
+    sendJson(res, payload.status, { error: payload.error });
     return;
   }
 
-  const history = Array.isArray(body.history) ? body.history.slice(-12) : [];
+  const { message, history } = payload;
   const contents = [
-    ...history
-      .filter((item) => item?.text && (item.role === 'user' || item.role === 'model'))
-      .map((item) => ({
-        role: item.role,
-        parts: [{ text: item.text }],
-      })),
+    ...history.map((item) => ({
+      role: item.role,
+      parts: [{ text: item.text }],
+    })),
     { role: 'user' as const, parts: [{ text: message }] },
   ];
 

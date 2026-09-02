@@ -1,7 +1,8 @@
 /**
  * Servidor de produção mínimo: arquivos estáticos de `dist/` + POST /api/chat.
- * Uso: GEMINI_API_KEY=... node --experimental-strip-types server/production.ts
+ * Uso: GEMINI_API_KEY=... FIREBASE_PROJECT_ID=... node --experimental-strip-types server/production.ts
  * (ou compile/adapte ao seu host). Em `npm run dev` / `preview` o proxy já vem no Vite.
+ * Em produção atrás de proxy, defina TRUST_PROXY=true.
  */
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';

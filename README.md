@@ -44,12 +44,14 @@ Acesse `http://localhost:8080`.
 | `VITE_SITE_URL` | Cliente / HTML | URL pública (OG, canonical). Sem barra final. |
 | `GEMINI_API_KEY` | **Servidor** | Chave Gemini — **nunca** use prefixo `VITE_` |
 | `VITE_FIREBASE_*` | Cliente | Config do projeto Firebase |
+| `FIREBASE_PROJECT_ID` | Servidor (opcional) | Project ID para validar ID tokens; default = `VITE_FIREBASE_PROJECT_ID` |
+| `TRUST_PROXY` | Servidor (opcional) | `true` para usar `X-Forwarded-For` no rate limit |
 
 Contatos: `src/constants/contact.ts`. Catálogo: `src/data/products.ts`.
 
 ### Segurança do chat
 
-A chave Gemini **não** vai para o bundle. Em `npm run dev` e `npm run preview`, o plugin Vite atende `POST /api/chat` com rate limit por IP. Em hospedagem estática pura, use `npm run start` (serve `dist/` + API) ou replique o handler no seu backend.
+A chave Gemini **não** vai para o bundle. `POST /api/chat` exige `Authorization: Bearer <Firebase ID token>`, valida o JWT nas chaves públicas do Firebase, limita body (16 KB) e mensagem (2 000 chars), e aplica rate limit por IP e por `uid`. Em `npm run dev` / `preview` o plugin Vite atende a rota; em produção use `npm run start` ou o mesmo handler no seu backend.
 
 ### Firestore
 

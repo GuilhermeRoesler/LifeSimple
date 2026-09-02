@@ -17,16 +17,16 @@ export async function askAssistant(
   history: ChatHistoryItem[] = [],
   idToken?: string | null
 ): Promise<string> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (idToken) {
-    headers.Authorization = `Bearer ${idToken}`;
+  if (!idToken) {
+    throw new Error('Sessão inválida. Recarregue a página e tente novamente.');
   }
 
   const response = await fetch('/api/chat', {
     method: 'POST',
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
     body: JSON.stringify({ message, history } satisfies ChatApiRequest),
   });
 

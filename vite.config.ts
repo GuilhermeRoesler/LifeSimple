@@ -13,6 +13,15 @@ export default defineConfig(({ mode }) => {
   if (env.GEMINI_API_KEY) {
     process.env.GEMINI_API_KEY = env.GEMINI_API_KEY;
   }
+  // Project ID usado pelo proxy /api/chat para validar ID tokens do Firebase
+  const firebaseProjectId =
+    env.FIREBASE_PROJECT_ID || env.VITE_FIREBASE_PROJECT_ID;
+  if (firebaseProjectId) {
+    process.env.FIREBASE_PROJECT_ID = firebaseProjectId;
+  }
+  if (env.TRUST_PROXY) {
+    process.env.TRUST_PROXY = env.TRUST_PROXY;
+  }
 
   const siteUrl = env.VITE_SITE_URL || "http://localhost:8080";
 
@@ -35,7 +44,7 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       environment: "node",
-      include: ["src/**/*.test.ts"],
+      include: ["src/**/*.test.ts", "server/**/*.test.ts"],
     },
   };
 });

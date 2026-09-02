@@ -139,7 +139,10 @@ export function useChat(enabled: boolean) {
         timestamp: Timestamp.now(),
       });
 
-      const idToken = user ? await user.getIdToken() : null;
+      const idToken = user ? await user.getIdToken(/* forceRefresh */ false) : null;
+      if (!idToken) {
+        throw new Error('Sessão inválida');
+      }
       const botResponseText = await askAssistant(text, history, idToken);
 
       await addDoc(collection(db, messagesCollectionPath), {
