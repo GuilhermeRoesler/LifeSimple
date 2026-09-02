@@ -15,6 +15,7 @@ import ProductModal from './ProductModal';
 import { Product } from '@/types';
 import { initialProducts } from '@/data/products';
 import { filterProductsBySearch, formatPrice } from '@/lib/format';
+import { publicUrl } from '@/lib/utils';
 
 const CATEGORIES = ['Emagrecimento', 'Academia', 'Pele'] as const;
 
@@ -42,7 +43,7 @@ function ProductCarousel({
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full">
               <div className="aspect-video relative overflow-hidden bg-accent flex items-center justify-center p-4">
                 <img
-                  src={product.imagem}
+                  src={publicUrl(product.imagem)}
                   alt={product.nome}
                   width={400}
                   height={225}

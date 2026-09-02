@@ -11,6 +11,7 @@ import {
 import { Product } from '@/types';
 import { openWhatsApp } from '@/lib/whatsapp';
 import { formatPrice, greetingForNow } from '@/lib/format';
+import { publicUrl } from '@/lib/utils';
 
 interface ProductModalProps {
   product: Product;
@@ -44,7 +45,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
         <div className="grid md:grid-cols-2 gap-6 py-4">
           <div>
             <img
-              src={product.imagem}
+              src={publicUrl(product.imagem)}
               alt={product.nome}
               width={480}
               height={480}

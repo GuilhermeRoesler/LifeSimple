@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MessageCircle, Menu, X } from 'lucide-react';
 import { InstagramIcon } from '@/components/icons/InstagramIcon';
+import { publicUrl } from '@/lib/utils';
 import { INSTAGRAM_URL } from '@/constants/contact';
 import { openWhatsApp } from '@/lib/whatsapp';
 import { Button } from '@/components/ui/button';
@@ -51,7 +52,7 @@ export default function Header() {
               className="flex items-center space-x-3"
             >
               <img
-                src="/favicon.svg"
+                src={publicUrl('/favicon.svg')}
                 alt="Life Simple"
                 width={40}
                 height={40}

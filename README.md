@@ -80,13 +80,40 @@ plugins/            # Plugin Vite /api/chat
 |---|---|
 | `npm run dev` | Dev + proxy `/api/chat` |
 | `npm run build` | Typecheck + build |
+| `npm run typecheck` | Só TypeScript (`tsc -b`) |
 | `npm run preview` | Preview do build (com proxy) |
 | `npm run start` | Serve `dist/` + API (produção local) |
 | `npm run lint` | ESLint |
 | `npm test` | Vitest |
+
+## CI/CD (GitHub Actions)
+
+Workflows em `.github/workflows/`:
+
+| Workflow | Quando | O que faz |
+|---|---|---|
+| **CI** (`ci.yml`) | Push/PR em `main` | Lint → typecheck → testes → build |
+| **Deploy Pages** (`deploy-pages.yml`) | Push em `main` ou manual | Valida, build com `base` do Pages e publica |
+
+### Ativar GitHub Pages
+
+1. No repositório: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. (Opcional) Configure variáveis/secrets para o build de produção:
+
+| Nome | Tipo | Uso |
+|---|---|---|
+| `VITE_SITE_URL` | Variable | URL pública (OG/canonical). Ex.: `https://user.github.io/LifeSimple` |
+| `VITE_BASE_PATH` | Variable | Override do base (default: `/NomeDoRepo/`). Use `/` se houver domínio customizado na raiz |
+| `VITE_FIREBASE_*` | Variables | Config Firebase do cliente |
+| `VITE_FIREBASE_API_KEY` | **Secret** | API key Firebase |
+
+3. Após o primeiro deploy bem-sucedido, o site fica em `https://<user>.github.io/<repo>/`.
+
+> **Nota:** GitHub Pages serve só o front estático. O chatbot (`POST /api/chat` + `GEMINI_API_KEY`) **não** roda no Pages — use `npm run start` ou outro host com a API para o chat em produção.
 
 ## Deploy
 
 1. Defina `VITE_SITE_URL` e Firebase no ambiente de build.
 2. Defina `GEMINI_API_KEY` apenas no ambiente do servidor/API.
 3. `npm run build` e publique `dist/` **junto** com um host que exponha `/api/chat` (ou `npm run start` atrás de um reverse proxy).
+4. Ou use o workflow **Deploy GitHub Pages** para publicar só o front estático.

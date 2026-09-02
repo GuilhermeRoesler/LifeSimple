@@ -24,8 +24,11 @@ export default defineConfig(({ mode }) => {
   }
 
   const siteUrl = env.VITE_SITE_URL || "http://localhost:8080";
+  // Project pages: /RepoName/ — root/custom domain: /
+  const base = env.VITE_BASE_PATH || "/";
 
   return {
+    base,
     plugins: [
       react(),
       tailwindcss(),

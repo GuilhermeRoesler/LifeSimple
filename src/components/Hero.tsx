@@ -1,6 +1,7 @@
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { openWhatsApp } from '@/lib/whatsapp';
+import { publicUrl } from '@/lib/utils';
 
 export default function Hero() {
   const handleWhatsApp = () => {
@@ -18,7 +19,7 @@ export default function Hero() {
     >
       <div
         className="absolute inset-0 bg-cover bg-center scale-105"
-        style={{ backgroundImage: 'url(/background-hero.jpg)' }}
+        style={{ backgroundImage: `url(${publicUrl('/background-hero.jpg')})` }}
         aria-hidden="true"
       />
       <div className="absolute inset-0 bg-gradient-to-br from-primary-dark/90 via-primary/85 to-primary-light/80" />

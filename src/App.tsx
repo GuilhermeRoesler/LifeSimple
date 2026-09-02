@@ -5,8 +5,10 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
 import LgpdPage from './pages/LgpdPage';
 
+const basename = import.meta.env.BASE_URL.replace(/\/$/, "");
+
 const App = () => (
-  <BrowserRouter>
+  <BrowserRouter basename={basename || undefined}>
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/privacidade" element={<PrivacyPolicy />} />
