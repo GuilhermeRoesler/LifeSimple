@@ -1,0 +1,47 @@
+# Dependencies
+node_modules
+
+# Build
+dist
+dist-ssr
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Caches
+.vite
+
+# Lockfiles from other package managers
+bun.lockb
+pnpm-lock.yaml
+yarn.lock
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Test coverage
+coverage
