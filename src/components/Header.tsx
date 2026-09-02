@@ -51,11 +51,11 @@ export default function Header() {
               className="flex items-center space-x-3"
             >
               <img
-                src="/icon2.png"
+                src="/favicon.svg"
                 alt="Life Simple"
-                width={128}
-                height={32}
-                className="h-8 w-auto"
+                width={40}
+                height={40}
+                className="h-9 w-9 lg:h-10 lg:w-10"
               />
               <span className="text-xl lg:text-2xl text-white font-light font-inter">
                 Life Simple
