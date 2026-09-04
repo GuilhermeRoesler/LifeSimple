@@ -23,16 +23,16 @@ export default function Hero() {
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 bg-gradient-to-r from-primary-dark/88 via-primary-dark/55 to-primary/25"
+        className="absolute inset-0 bg-gradient-to-r from-primary-dark/88 via-primary-dark/55 to-primary-dark/15 lg:via-primary-dark/45 lg:to-transparent"
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25"
+        className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20"
         aria-hidden="true"
       />
 
       <div className="relative z-10 container mx-auto px-4 pb-16 pt-28 lg:py-32">
-        <div className="max-w-3xl animate-fade-in">
+        <div className="max-w-2xl animate-fade-in">
           <p className="text-xs sm:text-sm uppercase tracking-[0.28em] text-white/80 mb-5 font-medium">
             Farmácia de manipulação · Porto Alegre
           </p>
@@ -66,6 +66,14 @@ export default function Hero() {
             </Button>
           </div>
         </div>
+      </div>
+
+      <div
+        className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 text-white/55"
+        aria-hidden="true"
+      >
+        <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
+        <span className="h-8 w-px bg-gradient-to-b from-white/60 to-transparent" />
       </div>
     </section>
   );

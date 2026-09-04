@@ -43,7 +43,10 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
         </DialogHeader>
 
         <div className="grid md:grid-cols-2 gap-6 py-4">
-          <div>
+          <div className="relative overflow-hidden rounded-2xl product-glow p-6">
+            <span className="absolute top-4 left-4 z-10 inline-flex items-center rounded-full border border-primary/15 bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary shadow-sm">
+              Life Simple
+            </span>
             <img
               src={publicUrl(product.imagem)}
               alt={product.nome}
@@ -51,7 +54,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
               height={480}
               loading="lazy"
               decoding="async"
-              className="w-full rounded-lg object-contain bg-accent"
+              className="relative z-0 mx-auto max-h-72 w-auto object-contain drop-shadow-[0_18px_30px_rgba(20,50,45,0.22)]"
             />
           </div>
 

@@ -149,6 +149,26 @@
   .section-lead {
     @apply mt-4 text-base md:text-lg leading-relaxed max-w-2xl;
   }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .product-glow {
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 72%, hsl(175 42% 38% / 0.18), transparent 70%),
+      linear-gradient(180deg, hsl(168 28% 96%), hsl(170 22% 92%));
+  }
 }
 
 @keyframes fade-in {
@@ -206,5 +226,11 @@ html {
   .animate-ken-burns,
   .animate-pulse-soft {
     animation: none;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
