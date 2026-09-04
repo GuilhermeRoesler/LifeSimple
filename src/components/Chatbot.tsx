@@ -73,7 +73,10 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
 
       {!isMinimized && (
         <>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[linear-gradient(180deg,hsl(170_25%_98%),hsl(168_20%_95%))]">
+          <div
+            data-lenis-prevent
+            className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[linear-gradient(180deg,hsl(170_25%_98%),hsl(168_20%_95%))]"
+          >
             {messages.length === 0 && !error && (
               <div className="rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm">
                 <p className="font-display text-lg text-foreground tracking-tight">Olá!</p>

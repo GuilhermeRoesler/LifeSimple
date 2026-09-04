@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useLenis } from 'lenis/react';
 import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,6 +22,17 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
+  const lenis = useLenis();
+
+  useEffect(() => {
+    if (!lenis) return;
+    if (isOpen) lenis.stop();
+    else lenis.start();
+    return () => {
+      lenis.start();
+    };
+  }, [isOpen, lenis]);
+
   const handleWhatsApp = () => {
     openWhatsApp(
       `Olá, ${greetingForNow()}! Gostaria de informações sobre o produto ${product.nome} da categoria ${product.categoria}.`

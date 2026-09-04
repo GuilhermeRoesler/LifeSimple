@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import SmoothScroll from '@/components/SmoothScroll';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -9,13 +10,15 @@ const basename = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const App = () => (
   <BrowserRouter basename={basename || undefined}>
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/privacidade" element={<PrivacyPolicy />} />
-      <Route path="/termos" element={<TermsOfUse />} />
-      <Route path="/lgpd" element={<LgpdPage />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <SmoothScroll>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/privacidade" element={<PrivacyPolicy />} />
+        <Route path="/termos" element={<TermsOfUse />} />
+        <Route path="/lgpd" element={<LgpdPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </SmoothScroll>
   </BrowserRouter>
 );
 

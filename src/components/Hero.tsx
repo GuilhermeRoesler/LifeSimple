@@ -1,6 +1,7 @@
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { openWhatsApp } from '@/lib/whatsapp';
+import { scrollToAnchor } from '@/lib/scroll';
 import { publicUrl } from '@/lib/utils';
 
 export default function Hero() {
@@ -9,7 +10,7 @@ export default function Hero() {
   };
 
   const scrollToProducts = () => {
-    document.querySelector('#produtos')?.scrollIntoView({ behavior: 'smooth' });
+    scrollToAnchor('#produtos');
   };
 
   return (

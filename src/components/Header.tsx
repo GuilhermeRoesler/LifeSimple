@@ -4,6 +4,7 @@ import { InstagramIcon } from '@/components/icons/InstagramIcon';
 import { cn, publicUrl } from '@/lib/utils';
 import { INSTAGRAM_URL } from '@/constants/contact';
 import { openWhatsApp } from '@/lib/whatsapp';
+import { scrollToAnchor } from '@/lib/scroll';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
@@ -49,7 +50,7 @@ export default function Header() {
 
   const handleNavClick = (href: string) => {
     setIsMobileMenuOpen(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+    scrollToAnchor(href);
   };
 
   return (
