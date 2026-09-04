@@ -67,26 +67,26 @@ export default function Hero() {
             <Button
               size="lg"
               onClick={handleWhatsApp}
-              className="border-0 bg-[linear-gradient(135deg,hsl(175_45%_32%),hsl(175_40%_48%))] text-white hover:opacity-90 transition-all duration-300 h-12 px-7 text-base shadow-lg shadow-black/25"
+              className="group border-0 bg-[linear-gradient(135deg,hsl(175_45%_32%),hsl(175_40%_48%))] text-white cta-sheen hover:brightness-110 hover:shadow-xl hover:shadow-black/30 transition-all duration-300 h-12 px-7 text-base shadow-lg shadow-black/25"
             >
-              <MessageCircle className="mr-2 h-5 w-5" />
+              <MessageCircle className="mr-2 h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
               Fale conosco
             </Button>
             <Button
               size="lg"
               variant="outline"
               onClick={scrollToProducts}
-              className="border-white/80 text-white bg-white/10 backdrop-blur-sm hover:bg-white hover:text-primary-dark h-12 px-7 text-base transition-all duration-300"
+              className="group border-white/80 text-white bg-white/10 backdrop-blur-sm hover:bg-white hover:text-primary-dark hover:shadow-lg hover:shadow-black/20 h-12 px-7 text-base transition-all duration-300"
             >
               Ver produtos
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
             </Button>
           </div>
         </div>
       </div>
 
       <div
-        className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 text-white/55"
+        className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 text-white/55 animate-scroll-hint"
         aria-hidden="true"
       >
         <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>

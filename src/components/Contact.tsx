@@ -72,31 +72,32 @@ Aguardo retorno. Obrigado(a)!`;
   };
 
   return (
-    <section id="contato" className="section-pad bg-background">
+    <section id="contato" className="py-12 md:py-16 bg-background">
       <div className="container mx-auto px-4">
-        <Reveal className="overflow-hidden rounded-3xl border border-border/70 shadow-[0_30px_80px_-48px_hsl(175_42%_20%/0.55)]">
+        <Reveal className="max-w-2xl mb-12">
+          <p className="text-xs uppercase tracking-[0.24em] text-primary mb-2 font-medium">
+            Contato
+          </p>
+          <h2 className="section-title text-foreground">Fale com a Life Simple</h2>
+          <p className="mt-2 text-sm md:text-base leading-relaxed text-muted-foreground">
+            Envie sua mensagem e continue a conversa no WhatsApp com a nossa equipe.
+          </p>
+        </Reveal>
+
+        <Reveal className="mx-auto max-w-6xl overflow-hidden rounded-2xl border border-border/70 shadow-[0_24px_60px_-40px_hsl(175_42%_20%/0.5)]">
           <div className="grid lg:grid-cols-12">
-            <div className="lg:col-span-5 bg-primary-dark text-primary-foreground p-8 sm:p-10 lg:p-12 relative overflow-hidden">
+            <div className="lg:col-span-5 bg-primary-dark text-primary-foreground p-6 sm:p-8 relative overflow-hidden">
               <div
-                className="pointer-events-none absolute -right-16 -bottom-20 h-56 w-56 rounded-full bg-primary-light/15 blur-2xl"
+                className="pointer-events-none absolute -right-12 -bottom-14 h-40 w-40 rounded-full bg-primary-light/15 blur-2xl"
                 aria-hidden="true"
               />
-              <p className="text-xs uppercase tracking-[0.24em] text-primary-light mb-3 font-medium">
-                Contato
-              </p>
-              <h2 className="font-heading text-3xl md:text-4xl font-semibold tracking-tight text-white">
-                Fale com a Life Simple
-              </h2>
-              <p className="mt-4 text-white/70 leading-relaxed">
-                Envie sua mensagem e continue a conversa no WhatsApp com a nossa equipe.
-              </p>
 
-              <div className="mt-10 space-y-6 relative">
-                <div className="flex gap-4">
-                  <MapPin className="h-5 w-5 text-primary-light shrink-0 mt-0.5" />
+              <div className="space-y-4 relative">
+                <div className="flex gap-3">
+                  <MapPin className="h-4 w-4 text-primary-light shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-white mb-1">Endereço</p>
-                    <p className="text-sm text-white/70 leading-relaxed">
+                    <p className="text-sm font-semibold text-white mb-0.5">Endereço</p>
+                    <p className="text-sm text-white/70 leading-snug">
                       {ADDRESS_LINES.map((line) => (
                         <span key={line}>
                           {line}
@@ -108,18 +109,18 @@ Aguardo retorno. Obrigado(a)!`;
                       href={MAPS_LINK}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary-light text-sm font-medium mt-2 inline-block hover:underline"
+                      className="text-primary-light text-sm font-medium mt-1.5 inline-block hover:underline"
                     >
                       Abrir no Google Maps
                     </a>
                   </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <Clock className="h-5 w-5 text-primary-light shrink-0 mt-0.5" />
+                <div className="flex gap-3">
+                  <Clock className="h-4 w-4 text-primary-light shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-white mb-1">Horário</p>
-                    <p className="text-sm text-white/70 leading-relaxed">
+                    <p className="text-sm font-semibold text-white mb-0.5">Horário</p>
+                    <p className="text-sm text-white/70 leading-snug">
                       {BUSINESS_HOURS.weekdays}
                       <br />
                       {BUSINESS_HOURS.saturday}
@@ -129,11 +130,11 @@ Aguardo retorno. Obrigado(a)!`;
                   </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <Phone className="h-5 w-5 text-primary-light shrink-0 mt-0.5" />
+                <div className="flex gap-3">
+                  <Phone className="h-4 w-4 text-primary-light shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-white mb-1">Canais</p>
-                    <p className="text-sm text-white/70 leading-relaxed">
+                    <p className="text-sm font-semibold text-white mb-0.5">Canais</p>
+                    <p className="text-sm text-white/70 leading-snug">
                       WhatsApp: {PHONE_DISPLAY}
                       <br />
                       E-mail: {EMAIL}
@@ -142,7 +143,7 @@ Aguardo retorno. Obrigado(a)!`;
                 </div>
               </div>
 
-              <div className="mt-8 rounded-2xl overflow-hidden border border-white/10 aspect-[16/10] bg-black/20">
+              <div className="mt-6 rounded-xl overflow-hidden border border-white/10 h-40 sm:h-60 bg-black/20">
                 <iframe
                   title="Localização Life Simple no mapa"
                   src={MAPS_EMBED_URL}
@@ -154,9 +155,9 @@ Aguardo retorno. Obrigado(a)!`;
               </div>
             </div>
 
-            <div className="lg:col-span-7 bg-card p-8 sm:p-10 lg:p-12">
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid sm:grid-cols-2 gap-5">
+            <div className="lg:col-span-7 bg-card p-6 sm:p-10">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="nome">Nome *</Label>
                     <Input
@@ -166,7 +167,7 @@ Aguardo retorno. Obrigado(a)!`;
                       value={formData.nome}
                       onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                       placeholder="Seu nome completo"
-                      className="mt-1.5 h-11"
+                      className="mt-1 h-10"
                     />
                   </div>
 
@@ -179,7 +180,7 @@ Aguardo retorno. Obrigado(a)!`;
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="seu@email.com"
-                      className="mt-1.5 h-11"
+                      className="mt-1 h-10"
                     />
                   </div>
                 </div>
@@ -192,7 +193,7 @@ Aguardo retorno. Obrigado(a)!`;
                     value={formData.telefone}
                     onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
                     placeholder="(51) 98935-4834"
-                    className="mt-1.5 h-11"
+                    className="mt-1 h-10"
                   />
                 </div>
 
@@ -204,8 +205,8 @@ Aguardo retorno. Obrigado(a)!`;
                     value={formData.mensagem}
                     onChange={(e) => setFormData({ ...formData, mensagem: e.target.value })}
                     placeholder="Como podemos ajudar você?"
-                    rows={5}
-                    className="mt-1.5"
+                    rows={4}
+                    className="mt-1 min-h-[88px]"
                   />
                 </div>
 
@@ -219,7 +220,7 @@ Aguardo retorno. Obrigado(a)!`;
                   />
                   <Label
                     htmlFor="consentimento"
-                    className="text-sm text-muted-foreground leading-relaxed"
+                    className="text-sm text-muted-foreground leading-snug"
                   >
                     Concordo com o processamento dos meus dados pessoais de acordo com a{' '}
                     <Link to="/privacidade" className="text-primary underline">
@@ -235,7 +236,7 @@ Aguardo retorno. Obrigado(a)!`;
 
                 {submitMessage && (
                   <div
-                    className={`p-3 rounded-lg text-sm ${
+                    className={`p-2.5 rounded-lg text-sm ${
                       submitMessage.includes('Redirecionando')
                         ? 'bg-success/10 text-success border border-success/20'
                         : 'bg-destructive/10 text-destructive'
@@ -248,7 +249,7 @@ Aguardo retorno. Obrigado(a)!`;
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full h-12 gradient-primary hover:opacity-90 text-base"
+                  className="w-full h-11 gradient-primary cta-sheen hover:brightness-110 hover:shadow-md hover:shadow-primary/25"
                 >
                   <Send className="mr-2 h-4 w-4" />
                   {isSubmitting ? 'Abrindo WhatsApp...' : 'Enviar via WhatsApp'}

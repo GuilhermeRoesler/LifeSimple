@@ -98,7 +98,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
         </div>
 
         <DialogFooter>
-          <Button onClick={handleWhatsApp} className="w-full gradient-primary hover:opacity-90">
+          <Button onClick={handleWhatsApp} className="w-full gradient-primary cta-sheen hover:brightness-110 hover:shadow-md hover:shadow-primary/25">
             <MessageCircle className="mr-2 h-4 w-4" />
             Fale Conosco no WhatsApp
           </Button>

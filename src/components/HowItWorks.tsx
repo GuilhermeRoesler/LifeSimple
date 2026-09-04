@@ -45,13 +45,13 @@ export default function HowItWorks() {
 
       <div className="relative container mx-auto px-4">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-end mb-14 md:mb-20">
-          <Reveal className="lg:col-span-7">
+          <Reveal className="lg:col-span-7" variant="left">
             <p className="text-xs uppercase tracking-[0.24em] text-primary-light mb-3 font-medium">
               Processo
             </p>
             <h2 className="section-title text-white">Do WhatsApp à fórmula na sua mão</h2>
           </Reveal>
-          <Reveal className="lg:col-span-5" delayMs={120}>
+          <Reveal className="lg:col-span-5" delayMs={140} variant="fade">
             <p className="text-white/70 text-base md:text-lg leading-relaxed lg:text-right">
               Três etapas claras, sem burocracia desnecessária — com orientação farmacêutica em
               cada passo.
@@ -61,17 +61,31 @@ export default function HowItWorks() {
 
         <ol className="relative grid md:grid-cols-3 gap-10 md:gap-6">
           <div
-            className="hidden md:block absolute top-[2.75rem] left-[8%] right-[8%] h-px bg-gradient-to-r from-transparent via-white/25 to-transparent"
+            className="hidden md:block absolute top-[2.75rem] left-[8%] right-[8%] h-px overflow-hidden"
             aria-hidden="true"
-          />
+          >
+            <Reveal
+              className="h-px w-full bg-gradient-to-r from-transparent via-white/25 to-transparent"
+              delayMs={180}
+              variant="fade"
+            >
+              <span className="sr-only"> </span>
+            </Reveal>
+          </div>
 
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
-              <Reveal key={step.number} as="li" delayMs={index * 110} className="relative">
-                <div className="flex flex-col md:items-start">
-                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/5 backdrop-blur-sm text-primary-light">
-                    <Icon className="h-6 w-6" strokeWidth={1.75} />
+              <Reveal
+                key={step.number}
+                as="li"
+                delayMs={160 + index * 140}
+                variant="scale"
+                className="relative group/step"
+              >
+                <div className="flex flex-col md:items-start transition-transform duration-500 group-hover/step:-translate-y-1">
+                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/5 backdrop-blur-sm text-primary-light transition-all duration-500 group-hover/step:border-primary-light/40 group-hover/step:bg-white/10 group-hover/step:scale-105">
+                    <Icon className="h-6 w-6 transition-transform duration-500 group-hover/step:scale-110" strokeWidth={1.75} />
                   </div>
                   <p className="font-display text-5xl md:text-6xl text-primary-light/85 mb-3 tracking-tight">
                     {step.number}
@@ -86,15 +100,15 @@ export default function HowItWorks() {
           })}
         </ol>
 
-        <Reveal className="mt-14 md:mt-16" delayMs={280}>
+        <Reveal className="mt-14 md:mt-16" delayMs={520}>
           <Button
             size="lg"
             onClick={() =>
               openWhatsApp('Olá! Quero iniciar uma consulta sobre uma fórmula manipulada.')
             }
-            className="h-12 px-7 border-0 bg-white text-primary-dark hover:bg-white/90"
+            className="group h-12 px-7 border-0 bg-white text-primary-dark cta-sheen hover:bg-white hover:shadow-lg hover:shadow-black/15 hover:-translate-y-0.5"
           >
-            <MessageCircle className="mr-2 h-5 w-5" />
+            <MessageCircle className="mr-2 h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
             Começar pelo WhatsApp
           </Button>
         </Reveal>

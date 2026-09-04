@@ -118,6 +118,43 @@
     animation: pulse-soft 2.4s ease-in-out infinite;
   }
 
+  .animate-scroll-hint {
+    animation: scroll-hint 2s ease-in-out infinite;
+  }
+
+  .animate-chat-in {
+    animation: chat-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-stagger-in {
+    animation: stagger-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--stagger-delay, 0ms);
+  }
+
+  .cta-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      hsl(0 0% 100% / 0.22) 50%,
+      transparent 60%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+
+  .cta-sheen:hover::after {
+    transform: translateX(120%);
+  }
+
   .glass-effect {
     @apply backdrop-blur-md bg-white/70 border border-white/25;
   }
@@ -159,15 +196,54 @@
     transition-delay: var(--reveal-delay, 0ms);
   }
 
+  .reveal-fade {
+    opacity: 0;
+    transform: none;
+  }
+
+  .reveal-scale {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+
   .reveal-visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) translateX(0) scale(1);
   }
 
   .product-glow {
     background:
       radial-gradient(ellipse 70% 55% at 50% 72%, hsl(175 42% 38% / 0.18), transparent 70%),
       linear-gradient(180deg, hsl(168 28% 96%), hsl(170 22% 92%));
+  }
+
+  .product-carousel-mask {
+    --carousel-fade: 6%;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--carousel-fade),
+      #000 calc(100% - var(--carousel-fade)),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--carousel-fade),
+      #000 calc(100% - var(--carousel-fade)),
+      transparent 100%
+    );
+  }
+
+  @media (min-width: 768px) {
+    .product-carousel-mask {
+      --carousel-fade: 10%;
+    }
   }
 }
 
@@ -216,6 +292,43 @@
   }
 }
 
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+
+@keyframes chat-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Scrollbar — verde-água do brand (Firefox + Chromium/WebKit) */
 html {
   scrollbar-width: thin;
@@ -260,13 +373,28 @@ html {
   .animate-fade-in,
   .animate-slide-up,
   .animate-ken-burns,
-  .animate-pulse-soft {
+  .animate-pulse-soft,
+  .animate-scroll-hint,
+  .animate-chat-in,
+  .animate-stagger-in {
     animation: none;
   }
 
-  .reveal {
+  .cta-sheen::after {
+    display: none;
+  }
+
+  .reveal,
+  .reveal-fade,
+  .reveal-scale,
+  .reveal-left {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  .product-carousel-mask {
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 }

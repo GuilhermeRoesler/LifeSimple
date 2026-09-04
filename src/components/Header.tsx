@@ -1,11 +1,18 @@
-import { useEffect, useState } from 'react';
-import { MessageCircle, Menu, X } from 'lucide-react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { MessageCircle, Menu } from 'lucide-react';
 import { InstagramIcon } from '@/components/icons/InstagramIcon';
 import { cn, publicUrl } from '@/lib/utils';
 import { INSTAGRAM_URL } from '@/constants/contact';
 import { openWhatsApp } from '@/lib/whatsapp';
 import { scrollToAnchor } from '@/lib/scroll';
 import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 const navItems = [
   { label: 'Home', href: '#home' },
@@ -21,6 +28,8 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeHref, setActiveHref] = useState('#home');
   const [scrollProgress, setScrollProgress] = useState(0);
+  const navRef = useRef<HTMLElement>(null);
+  const [underline, setUnderline] = useState({ left: 0, width: 0, ready: false });
 
   useEffect(() => {
     const sectionIds = navItems.map((item) => item.href.slice(1));
@@ -47,6 +56,26 @@ export default function Header() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+
+    const updateUnderline = () => {
+      const active = nav.querySelector<HTMLElement>(`[data-nav-href="${activeHref}"]`);
+      if (!active) return;
+      setUnderline({ left: active.offsetLeft, width: active.offsetWidth, ready: true });
+    };
+
+    updateUnderline();
+    const observer = new ResizeObserver(updateUnderline);
+    observer.observe(nav);
+    window.addEventListener('resize', updateUnderline);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateUnderline);
+    };
+  }, [activeHref]);
 
   const handleNavClick = (href: string) => {
     setIsMobileMenuOpen(false);
@@ -77,7 +106,7 @@ export default function Header() {
                 e.preventDefault();
                 handleNavClick('#home');
               }}
-              className="flex items-center space-x-3"
+              className="flex items-center space-x-3 cursor-pointer"
             >
               <img
                 src={publicUrl('/favicon.svg')}
@@ -92,34 +121,40 @@ export default function Header() {
             </a>
           </div>
 
-          <nav className="hidden lg:flex items-center gap-5 xl:gap-6" aria-label="Principal">
+          <nav
+            ref={navRef}
+            className="relative hidden lg:flex items-center gap-5 xl:gap-6"
+            aria-label="Principal"
+          >
             {navItems.map((item) => {
               const isActive = activeHref === item.href;
               return (
                 <a
                   key={item.href}
                   href={item.href}
+                  data-nav-href={item.href}
                   onClick={(e) => {
                     e.preventDefault();
                     handleNavClick(item.href);
                   }}
                   aria-current={isActive ? 'true' : undefined}
                   className={cn(
-                    'relative text-sm font-medium transition-colors duration-200 py-1 whitespace-nowrap',
+                    'relative text-sm font-medium transition-colors duration-200 py-1 whitespace-nowrap cursor-pointer',
                     isActive ? 'text-white' : 'text-white/75 hover:text-white'
                   )}
                 >
                   {item.label}
-                  <span
-                    className={cn(
-                      'absolute -bottom-0.5 left-0 h-px bg-primary-light transition-all duration-300',
-                      isActive ? 'w-full opacity-100' : 'w-0 opacity-0'
-                    )}
-                    aria-hidden="true"
-                  />
                 </a>
               );
             })}
+            <span
+              aria-hidden="true"
+              className={cn(
+                'absolute -bottom-0.5 h-px bg-primary-light transition-[left,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
+                underline.ready ? 'opacity-100' : 'opacity-0'
+              )}
+              style={{ left: underline.left, width: underline.width }}
+            />
           </nav>
 
           <div className="flex items-center space-x-2">
@@ -144,69 +179,76 @@ export default function Header() {
               </Button>
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden bg-white/10 text-white hover:bg-white/20 hover:text-white"
-              aria-label={isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
-              aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-menu"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="lg:hidden bg-white/10 text-white hover:bg-white/20 hover:text-white"
+                  aria-label="Abrir menu"
+                >
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="right"
+                className="w-[min(100vw-2rem,20rem)] border-white/10 bg-primary-dark p-0 text-white [&>button]:text-white [&>button]:opacity-80 [&>button]:hover:opacity-100 [&>button]:ring-offset-primary-dark"
+              >
+                <SheetHeader className="border-b border-white/10 px-6 py-5 text-left">
+                  <SheetTitle className="font-display text-white">Menu</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col space-y-1 px-6 py-4" aria-label="Mobile">
+                  {navItems.map((item) => {
+                    const isActive = activeHref === item.href;
+                    return (
+                      <a
+                        key={item.href}
+                        href={item.href}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNavClick(item.href);
+                        }}
+                        aria-current={isActive ? 'true' : undefined}
+                        className={cn(
+                          'transition-colors duration-200 font-medium py-2.5 cursor-pointer',
+                          isActive ? 'text-white' : 'text-white/80 hover:text-white'
+                        )}
+                      >
+                        {item.label}
+                      </a>
+                    );
+                  })}
+                  <div className="flex items-center space-x-3 pt-3 border-t border-white/15">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        openWhatsApp();
+                      }}
+                      className="flex-1 border-white/30 bg-transparent text-white hover:bg-white hover:text-primary-dark"
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      WhatsApp
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        window.open(INSTAGRAM_URL, '_blank', 'noopener,noreferrer');
+                      }}
+                      className="flex-1 border-white/30 bg-transparent text-white hover:bg-white hover:text-primary-dark"
+                    >
+                      <InstagramIcon className="h-4 w-4 mr-2" />
+                      Instagram
+                    </Button>
+                  </div>
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
-
-        {isMobileMenuOpen && (
-          <div
-            id="mobile-menu"
-            className="lg:hidden py-4 border-t border-white/10 animate-slide-up px-4 bg-primary-dark/95 backdrop-blur-xl"
-          >
-            <nav className="flex flex-col space-y-1" aria-label="Mobile">
-              {navItems.map((item) => {
-                const isActive = activeHref === item.href;
-                return (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNavClick(item.href);
-                    }}
-                    aria-current={isActive ? 'true' : undefined}
-                    className={cn(
-                      'transition-colors duration-200 font-medium py-2.5',
-                      isActive ? 'text-white' : 'text-white/80 hover:text-white'
-                    )}
-                  >
-                    {item.label}
-                  </a>
-                );
-              })}
-              <div className="flex items-center space-x-3 pt-3 border-t border-white/15">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openWhatsApp()}
-                  className="flex-1 border-white/30 bg-transparent text-white hover:bg-white hover:text-primary-dark"
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  WhatsApp
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.open(INSTAGRAM_URL, '_blank', 'noopener,noreferrer')}
-                  className="flex-1 border-white/30 bg-transparent text-white hover:bg-white hover:text-primary-dark"
-                >
-                  <InstagramIcon className="h-4 w-4 mr-2" />
-                  Instagram
-                </Button>
-              </div>
-            </nav>
-          </div>
-        )}
       </div>
     </header>
   );

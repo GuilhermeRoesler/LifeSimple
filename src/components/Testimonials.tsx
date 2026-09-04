@@ -1,4 +1,5 @@
 import Reveal from '@/components/Reveal';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
 const testimonials = [
@@ -50,7 +51,7 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-function Avatar({
+function TestimonialAvatar({
   name,
   tone,
   size = 'md',
@@ -60,17 +61,24 @@ function Avatar({
   size?: 'md' | 'lg';
 }) {
   return (
-    <span
+    <Avatar
       className={cn(
-        'relative flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br font-semibold text-primary ring-2 ring-white shadow-[0_8px_20px_-10px_hsl(175_42%_28%/0.55)]',
-        tone,
-        size === 'lg' ? 'h-14 w-14 text-sm' : 'h-10 w-10 text-xs'
+        'overflow-visible ring-2 ring-white shadow-[0_8px_20px_-10px_hsl(175_42%_28%/0.55)] transition-transform duration-500',
+        size === 'lg' ? 'h-14 w-14' : 'h-10 w-10'
       )}
       aria-hidden="true"
     >
-      <span className="absolute inset-[3px] rounded-full bg-white/55 backdrop-blur-[1px]" />
-      <span className="relative">{initials(name)}</span>
-    </span>
+      <AvatarFallback
+        className={cn(
+          'relative bg-gradient-to-br font-semibold text-primary',
+          tone,
+          size === 'lg' ? 'text-sm' : 'text-xs'
+        )}
+      >
+        <span className="absolute inset-[3px] rounded-full bg-white/55 backdrop-blur-[1px]" />
+        <span className="relative">{initials(name)}</span>
+      </AvatarFallback>
+    </Avatar>
   );
 }
 
@@ -85,7 +93,7 @@ export default function Testimonials() {
       />
 
       <div className="container mx-auto px-4">
-        <Reveal className="max-w-2xl mb-14">
+        <Reveal className="max-w-2xl mb-14" variant="left">
           <p className="text-xs uppercase tracking-[0.24em] text-primary mb-3 font-medium">
             Clientes
           </p>
@@ -96,12 +104,16 @@ export default function Testimonials() {
         </Reveal>
 
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16">
-          <Reveal as="blockquote" className="lg:col-span-6 lg:sticky lg:top-28 lg:self-start">
-            <p className="font-display text-3xl md:text-4xl lg:text-[2.65rem] leading-snug text-foreground tracking-tight">
+          <Reveal
+            as="blockquote"
+            variant="scale"
+            className="lg:col-span-6 lg:sticky lg:top-28 lg:self-start group/quote"
+          >
+            <p className="font-display text-3xl md:text-4xl lg:text-[2.65rem] leading-snug text-foreground tracking-tight transition-colors duration-500">
               &ldquo;{featured.text}&rdquo;
             </p>
             <footer className="mt-8 flex items-center gap-4">
-              <Avatar name={featured.name} tone={featured.tone} size="lg" />
+              <TestimonialAvatar name={featured.name} tone={featured.tone} size="lg" />
               <div>
                 <cite className="not-italic font-semibold text-foreground">{featured.name}</cite>
                 <p className="text-sm text-muted-foreground">{featured.city}</p>
@@ -114,21 +126,24 @@ export default function Testimonials() {
               <Reveal
                 as="blockquote"
                 key={`${testimonial.name}-${testimonial.city}`}
-                delayMs={80 + index * 70}
-                className="border-t border-border pt-5"
+                delayMs={100 + index * 90}
+                variant="scale"
+                className="group/item border-t border-border pt-5"
               >
-                <p className="text-[0.95rem] leading-relaxed text-foreground/85">
-                  &ldquo;{testimonial.text}&rdquo;
-                </p>
-                <footer className="mt-4 flex items-center gap-3">
-                  <Avatar name={testimonial.name} tone={testimonial.tone} />
-                  <div>
-                    <cite className="not-italic text-sm font-semibold text-foreground">
-                      {testimonial.name}
-                    </cite>
-                    <p className="text-xs text-muted-foreground">{testimonial.city}</p>
-                  </div>
-                </footer>
+                <div className="transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1">
+                  <p className="text-[0.95rem] leading-relaxed text-foreground/85">
+                    &ldquo;{testimonial.text}&rdquo;
+                  </p>
+                  <footer className="mt-4 flex items-center gap-3">
+                    <TestimonialAvatar name={testimonial.name} tone={testimonial.tone} />
+                    <div>
+                      <cite className="not-italic text-sm font-semibold text-foreground">
+                        {testimonial.name}
+                      </cite>
+                      <p className="text-xs text-muted-foreground">{testimonial.city}</p>
+                    </div>
+                  </footer>
+                </div>
               </Reveal>
             ))}
           </div>

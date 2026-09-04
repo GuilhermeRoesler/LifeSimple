@@ -20,7 +20,7 @@ export const initialProducts: Product[] = [
     id: "m-emag-02",
     nome: "Bloqueador Carbo",
     categoria: "Emagrecimento",
-    descricao_curta: "Auxílio no controle de absorção de carboidratos.",
+    descricao_curta: "Auxílio na absorção de carboidratos.",
     descricao_longa: "Fórmula com extratos naturais para auxiliar na redução da absorção de carboidratos. Faseolamina e cromo.",
     preco: "64.90",
     imagem: "/img/bloqueador-carbo.webp"

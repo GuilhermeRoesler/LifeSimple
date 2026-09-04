@@ -1,5 +1,11 @@
 import { faqItems } from '@/data/faq';
 import Reveal from '@/components/Reveal';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 export default function Faq() {
   const jsonLd = {
@@ -33,24 +39,21 @@ export default function Faq() {
         </Reveal>
 
         <Reveal delayMs={100}>
-          <div className="divide-y divide-border border-y border-border">
+          <Accordion
+            type="single"
+            collapsible
+            className="border-t border-border"
+            defaultValue={faqItems[0]?.question}
+          >
             {faqItems.map((item) => (
-              <details key={item.question} className="group py-5">
-                <summary className="cursor-pointer list-none flex items-start justify-between gap-6 font-medium text-foreground">
+              <AccordionItem key={item.question} value={item.question}>
+                <AccordionTrigger>
                   <span className="text-base md:text-lg leading-snug pr-2">{item.question}</span>
-                  <span
-                    className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border text-primary text-lg leading-none transition-transform duration-300 group-open:rotate-45"
-                    aria-hidden="true"
-                  >
-                    +
-                  </span>
-                </summary>
-                <p className="mt-3 pr-12 text-muted-foreground text-sm md:text-[0.95rem] leading-relaxed">
-                  {item.answer}
-                </p>
-              </details>
+                </AccordionTrigger>
+                <AccordionContent>{item.answer}</AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </Reveal>
       </div>
     </section>

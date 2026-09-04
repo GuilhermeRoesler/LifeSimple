@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { MessageCircle, Send, X, Minimize2 } from 'lucide-react';
 import { useChat } from '@/hooks/useChat';
-import { publicUrl } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { cn, publicUrl } from '@/lib/utils';
 
 interface ChatbotPanelProps {
   onClose: () => void;
@@ -28,10 +31,11 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
   };
 
   return (
-    <div
-      className={`fixed bottom-6 right-6 z-40 overflow-hidden transition-all duration-300 rounded-2xl bg-card border border-border/80 shadow-[0_28px_60px_-28px_hsl(175_42%_20%/0.55)] ${
+    <Card
+      className={cn(
+        'fixed bottom-6 right-6 z-40 overflow-hidden rounded-2xl border-border/80 shadow-[0_28px_60px_-28px_hsl(175_42%_20%/0.55)] w-[min(100vw-2rem,380px)] md:w-[400px] flex flex-col origin-bottom-right animate-chat-in transition-[height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] py-0 gap-0',
         isMinimized ? 'h-14' : 'h-[520px]'
-      } w-[min(100vw-2rem,380px)] md:w-[400px] flex flex-col`}
+      )}
     >
       <div className="flex items-center justify-between px-3.5 py-3 border-b border-white/10 gradient-primary text-primary-foreground">
         <div className="flex items-center gap-3 min-w-0">
@@ -52,39 +56,45 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
           </div>
         </div>
         <div className="flex items-center space-x-0.5">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={onToggleMinimize}
-            className="h-8 w-8 rounded-full text-primary-foreground hover:bg-black/10 flex items-center justify-center transition-colors"
+            className="h-8 w-8 rounded-full text-primary-foreground hover:bg-black/10 hover:text-primary-foreground"
             aria-label={isMinimized ? 'Expandir chat' : 'Minimizar chat'}
           >
             <Minimize2 className="h-4 w-4" />
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="h-8 w-8 rounded-full text-primary-foreground hover:bg-black/10 flex items-center justify-center transition-colors"
+            className="h-8 w-8 rounded-full text-primary-foreground hover:bg-black/10 hover:text-primary-foreground"
             aria-label="Fechar chat"
           >
             <X className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
       </div>
 
       {!isMinimized && (
         <>
-          <div
+          <CardContent
             data-lenis-prevent
             className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[linear-gradient(180deg,hsl(170_25%_98%),hsl(168_20%_95%))]"
           >
             {messages.length === 0 && !error && (
-              <div className="rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm">
-                <p className="font-display text-lg text-foreground tracking-tight">Olá!</p>
-                <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                  Posso ajudar com catálogo, prazos e como iniciar sua fórmula. Em caso clínico,
-                  a equipe farmacêutica assume pelo WhatsApp.
-                </p>
-              </div>
+              <Card className="rounded-2xl border-border/70 bg-card/90 shadow-sm animate-fade-in">
+                <CardContent className="p-4">
+                  <p className="font-display text-lg text-foreground tracking-tight">Olá!</p>
+                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                    Posso ajudar com catálogo, prazos e como iniciar sua fórmula. Em caso clínico,
+                    a equipe farmacêutica assume pelo WhatsApp.
+                  </p>
+                </CardContent>
+              </Card>
             )}
 
             {error && (
@@ -96,7 +106,7 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex items-end gap-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex items-end gap-2 animate-fade-in ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {message.sender === 'bot' && (
                   <span
@@ -129,7 +139,7 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
             ))}
 
             {isTyping && (
-              <div className="flex justify-start gap-2 items-end">
+              <div className="flex justify-start gap-2 items-end animate-fade-in">
                 <span
                   className="mb-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10"
                   aria-hidden="true"
@@ -146,32 +156,33 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
               </div>
             )}
             <div ref={messagesEndRef} />
-          </div>
+          </CardContent>
 
           <div className="p-3 border-t border-border bg-card">
             <div className="flex gap-2">
-              <input
+              <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="Digite sua mensagem..."
                 aria-label="Mensagem do chat"
-                className="flex-1 px-3.5 py-2.5 border border-border bg-input text-foreground rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                className="flex-1 rounded-full border-border bg-input px-3.5 h-10"
               />
-              <button
+              <Button
                 type="button"
+                size="icon"
                 onClick={() => void sendMessage()}
                 disabled={!inputMessage.trim()}
-                className="w-10 h-10 flex-shrink-0 gradient-primary text-primary-foreground rounded-full flex items-center justify-center hover:opacity-90 disabled:bg-muted disabled:opacity-50 transition-all"
+                className="shrink-0 rounded-full gradient-primary hover:brightness-110"
                 aria-label="Enviar mensagem"
               >
                 <Send className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           </div>
         </>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -181,17 +192,18 @@ export default function Chatbot() {
 
   if (!isOpen) {
     return (
-      <button
+      <Button
         type="button"
+        size="icon"
         onClick={() => {
           setIsOpen(true);
           setIsMinimized(false);
         }}
-        className="fixed bottom-6 right-6 z-40 h-14 w-14 md:h-16 md:w-16 rounded-full text-primary-foreground gradient-primary flex items-center justify-center hover:opacity-90 hover:scale-105 transition-all duration-300 animate-pulse-soft shadow-lg shadow-primary/30"
+        className="fixed bottom-6 right-6 z-40 h-14 w-14 md:h-16 md:w-16 rounded-full gradient-primary hover:brightness-110 hover:scale-105 active:scale-95 animate-pulse-soft shadow-lg shadow-primary/30 [&_svg]:size-7 md:[&_svg]:size-8"
         aria-label="Abrir chat"
       >
-        <MessageCircle className="h-7 w-7 md:h-8 md:w-8" />
-      </button>
+        <MessageCircle />
+      </Button>
     );
   }
 
