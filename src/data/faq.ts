@@ -25,3 +25,8 @@ export const faqItems: FaqItem[] = [
       'A validade varia de 3 a 6 meses, dependendo da formulação. Sempre indicamos na embalagem.',
   },
 ];
+
+/** FAQ resumida para o system prompt do chat. */
+export function buildFaqForPrompt(): string {
+  return faqItems.map((item) => `P: ${item.question}\nR: ${item.answer}`).join('\n\n');
+}

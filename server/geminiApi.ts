@@ -1,10 +1,12 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { productNames } from '../src/data/products.ts';
+import { buildProductCatalogForPrompt } from '../src/data/products.ts';
+import { buildFaqForPrompt } from '../src/data/faq.ts';
 import {
   ADDRESS,
   BUSINESS_HOURS,
   EMAIL,
   PHONE_DISPLAY,
+  WHATSAPP_NUMBER,
 } from '../src/constants/contact.ts';
 import {
   MAX_BODY_BYTES,
@@ -15,12 +17,7 @@ import {
   getFirebaseProjectId,
   verifyFirebaseIdToken,
 } from './firebaseAuth.ts';
-
-type RateBucket = { hits: number[] };
-
-const RATE_WINDOW_MS = 60_000;
-const RATE_MAX = 20;
-const buckets = new Map<string, RateBucket>();
+import { isRateLimited } from './rateLimit.ts';
 
 function trustProxy(): boolean {
   const value = process.env.TRUST_PROXY?.trim().toLowerCase();
@@ -37,34 +34,30 @@ function getClientIp(req: IncomingMessage): string {
   return req.socket.remoteAddress ?? 'unknown';
 }
 
-function isRateLimited(key: string): boolean {
-  const now = Date.now();
-  const bucket = buckets.get(key) ?? { hits: [] };
-  bucket.hits = bucket.hits.filter((t) => now - t < RATE_WINDOW_MS);
-  if (bucket.hits.length >= RATE_MAX) {
-    buckets.set(key, bucket);
-    return true;
-  }
-  bucket.hits.push(now);
-  buckets.set(key, bucket);
-  return false;
-}
-
 function buildSystemPrompt(): string {
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}`;
   return `
 Você é o assistente virtual da farmácia de manipulados Life Simple. Seu tom deve ser educado, atencioso e claro.
 
 Você pode responder sobre manipulação de medicamentos (sem prescrever), horários, prazos de entrega, formas de pagamento e como solicitar orçamentos. Nunca forneça diagnósticos ou prescreva medicamentos.
 
-Quando não souber responder, oriente o cliente a entrar em contato:
-- WhatsApp: ${PHONE_DISPLAY}
+Quando não souber responder, oriente o cliente a entrar em contato e inclua o link do WhatsApp em texto puro (uma URL completa em linha própria):
+${whatsappUrl}
+
+Contato:
+- WhatsApp: ${PHONE_DISPLAY} — ${whatsappUrl}
 - E-mail: ${EMAIL}
 - Endereço: ${ADDRESS}
 - Horário: ${BUSINESS_HOURS.weekdays}, ${BUSINESS_HOURS.saturday}, ${BUSINESS_HOURS.sunday}
 
-Produtos disponíveis: ${productNames}.
+Catálogo (preços de referência; peça confirmação no WhatsApp para orçamento):
+${buildProductCatalogForPrompt()}
 
-Nunca mencione que é uma IA. Apresente-se como assistente virtual da Life Simple.`.trim();
+Perguntas frequentes:
+${buildFaqForPrompt()}
+
+Nunca mencione que é uma IA. Apresente-se como assistente virtual da Life Simple.
+Respostas curtas e úteis; quando falar de produto, use nome e categoria do catálogo.`.trim();
 }
 
 class BodyTooLargeError extends Error {
@@ -100,12 +93,99 @@ async function readJsonBody(req: IncomingMessage, maxBytes: number): Promise<unk
 
 function sendJson(res: ServerResponse, status: number, body: unknown): void {
   res.statusCode = status;
-  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.end(JSON.stringify(body));
 }
 
 function drainRequest(req: IncomingMessage): void {
   req.resume();
+}
+
+function extractTextDelta(payload: unknown): string {
+  if (!payload || typeof payload !== 'object') return '';
+  const candidates = (payload as { candidates?: unknown }).candidates;
+  if (!Array.isArray(candidates) || candidates.length === 0) return '';
+  const first = candidates[0];
+  if (!first || typeof first !== 'object') return '';
+  const content = (first as { content?: unknown }).content;
+  if (!content || typeof content !== 'object') return '';
+  const parts = (content as { parts?: unknown }).parts;
+  if (!Array.isArray(parts)) return '';
+  let text = '';
+  for (const part of parts) {
+    if (part && typeof part === 'object' && typeof (part as { text?: unknown }).text === 'string') {
+      text += (part as { text: string }).text;
+    }
+  }
+  return text;
+}
+
+/** Consome SSE do Gemini e escreve texto acumulado no response do cliente. */
+async function pipeGeminiSseToClient(
+  geminiBody: ReadableStream<Uint8Array> | null,
+  res: ServerResponse
+): Promise<void> {
+  if (!geminiBody) {
+    throw new Error('Resposta Gemini sem body');
+  }
+
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+
+  const reader = geminiBody.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let wroteAny = false;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('data:')) continue;
+        const data = trimmed.slice(5).trim();
+        if (!data || data === '[DONE]') continue;
+        try {
+          const delta = extractTextDelta(JSON.parse(data) as unknown);
+          if (delta) {
+            res.write(delta);
+            wroteAny = true;
+          }
+        } catch {
+          /* chunk SSE inválido — ignora */
+        }
+      }
+    }
+
+    if (buffer.trim().startsWith('data:')) {
+      const data = buffer.trim().slice(5).trim();
+      if (data && data !== '[DONE]') {
+        try {
+          const delta = extractTextDelta(JSON.parse(data) as unknown);
+          if (delta) {
+            res.write(delta);
+            wroteAny = true;
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+    }
+
+    if (!wroteAny) {
+      res.write('Desculpe, não consegui processar sua solicitação no momento.');
+    }
+  } finally {
+    res.end();
+  }
 }
 
 export async function handleChatRequest(
@@ -211,7 +291,7 @@ export async function handleChatRequest(
     { role: 'user' as const, parts: [{ text: message }] },
   ];
 
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=${apiKey}`;
 
   try {
     const response = await fetch(apiUrl, {
@@ -231,19 +311,16 @@ export async function handleChatRequest(
       return;
     }
 
-    const data = (await response.json()) as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-    };
-    const text =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      'Desculpe, não consegui processar sua solicitação no momento.';
-
-    sendJson(res, 200, { text });
+    await pipeGeminiSseToClient(response.body, res);
   } catch (error) {
     console.error('Gemini proxy error:', error);
-    sendJson(res, 500, {
-      error: 'Erro interno. Tente novamente ou fale pelo WhatsApp.',
-    });
+    if (!res.headersSent) {
+      sendJson(res, 500, {
+        error: 'Erro interno. Tente novamente ou fale pelo WhatsApp.',
+      });
+    } else {
+      res.end();
+    }
   }
 }
 

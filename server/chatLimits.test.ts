@@ -1,9 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, beforeEach } from 'vitest';
 import {
   MAX_MESSAGE_CHARS,
   validateChatPayload,
 } from './chatLimits.ts';
 import { extractBearerToken } from './firebaseAuth.ts';
+import {
+  RATE_MAX,
+  isRateLimited,
+  resetRateLimitForTests,
+} from './rateLimit.ts';
+import { buildProductCatalogForPrompt } from '../src/data/products.ts';
+import { buildFaqForPrompt } from '../src/data/faq.ts';
 
 describe('extractBearerToken', () => {
   it('aceita Bearer token', () => {
@@ -58,5 +65,34 @@ describe('validateChatPayload', () => {
     expect(result.history).toHaveLength(2);
     expect(result.history[0]!.text).toHaveLength(2_000);
     expect(result.history[1]!.text).toBe('resposta');
+  });
+});
+
+describe('rateLimit', () => {
+  beforeEach(() => {
+    resetRateLimitForTests();
+  });
+
+  it('permite até RATE_MAX e bloqueia o seguinte', () => {
+    const key = `test:${Date.now()}`;
+    for (let i = 0; i < RATE_MAX; i++) {
+      expect(isRateLimited(key)).toBe(false);
+    }
+    expect(isRateLimited(key)).toBe(true);
+  });
+});
+
+describe('prompt sources', () => {
+  it('catálogo inclui nome e categoria', () => {
+    const catalog = buildProductCatalogForPrompt();
+    expect(catalog).toContain('Slim Fórmula A');
+    expect(catalog).toContain('Emagrecimento');
+    expect(catalog).toContain('|');
+  });
+
+  it('FAQ inclui perguntas conhecidas', () => {
+    const faq = buildFaqForPrompt();
+    expect(faq).toContain('manipular');
+    expect(faq).toContain('24 a 48');
   });
 });

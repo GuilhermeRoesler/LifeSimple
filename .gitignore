@@ -45,3 +45,6 @@ Desktop.ini
 
 # Test coverage
 coverage
+
+# Server runtime (rate limit buckets)
+.data

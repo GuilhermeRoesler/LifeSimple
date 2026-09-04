@@ -265,3 +265,13 @@ export const initialProducts: Product[] = [
 ];
 
 export const productNames = initialProducts.map((p) => p.nome).join(', ');
+
+/** Catálogo resumido para o system prompt do chat (nome, categoria, descrição, preço). */
+export function buildProductCatalogForPrompt(): string {
+  return initialProducts
+    .map(
+      (p) =>
+        `- ${p.nome} | ${p.categoria} | ${p.descricao_curta} | a partir de R$ ${p.preco.replace('.', ',')}`
+    )
+    .join('\n');
+}

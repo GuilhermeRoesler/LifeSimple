@@ -1,10 +1,85 @@
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { MessageCircle, Send, X, Minimize2 } from 'lucide-react';
 import { useChat } from '@/hooks/useChat';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { cn, publicUrl } from '@/lib/utils';
+import { buildWhatsAppUrl, openWhatsApp } from '@/lib/whatsapp';
+
+const QUICK_REPLIES = [
+  { id: 'hours', label: 'Horários', text: 'Quais são os horários de funcionamento?' },
+  { id: 'products', label: 'Produtos', text: 'Quais produtos vocês têm no catálogo?' },
+  {
+    id: 'whatsapp',
+    label: 'WhatsApp',
+    action: 'whatsapp' as const,
+    message: 'Olá! Vim pelo site da Life Simple e gostaria de atendimento.',
+  },
+] as const;
+
+function linkifyMessage(text: string): ReactNode[] {
+  const re = /(https?:\/\/[^\s<]+)/g;
+  const nodes: ReactNode[] = [];
+  let last = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+
+  while ((match = re.exec(text)) !== null) {
+    if (match.index > last) {
+      nodes.push(text.slice(last, match.index));
+    }
+    let url = match[1]!;
+    let trailing = '';
+    const punct = url.match(/[),.;!?]+$/);
+    if (punct) {
+      trailing = punct[0];
+      url = url.slice(0, -trailing.length);
+    }
+    const isWhatsApp = /wa\.me\//i.test(url);
+    nodes.push(
+      <a
+        key={`link-${key++}`}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={
+          isWhatsApp
+            ? 'font-medium text-primary underline underline-offset-2'
+            : 'underline underline-offset-2 break-all'
+        }
+      >
+        {isWhatsApp ? 'Falar no WhatsApp' : url}
+      </a>
+    );
+    if (trailing) nodes.push(trailing);
+    last = match.index + match[0].length;
+  }
+
+  if (last < text.length) {
+    nodes.push(text.slice(last));
+  }
+  return nodes.length > 0 ? nodes : [text];
+}
+
+function ChatBubbleText({
+  text,
+  tone,
+}: {
+  text: string;
+  tone: 'user' | 'bot';
+}) {
+  return (
+    <p
+      className={cn(
+        'text-sm whitespace-pre-wrap leading-relaxed',
+        tone === 'user' ? 'text-primary-foreground' : 'text-foreground'
+      )}
+    >
+      {tone === 'bot' ? linkifyMessage(text) : text}
+    </p>
+  );
+}
 
 interface ChatbotPanelProps {
   onClose: () => void;
@@ -18,15 +93,21 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
     inputMessage,
     setInputMessage,
     isTyping,
+    streamingText,
+    ephemeralError,
+    dismissEphemeralError,
     error,
     messagesEndRef,
     sendMessage,
   } = useChat(true);
 
+  const busy = isTyping || streamingText !== null;
+  const showQuickReplies = !busy && !error && messages.length <= 1;
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      void sendMessage();
+      if (!busy && inputMessage.trim()) void sendMessage();
     }
   };
 
@@ -85,22 +166,22 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
             data-lenis-prevent
             className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[linear-gradient(180deg,hsl(170_25%_98%),hsl(168_20%_95%))]"
           >
-            {messages.length === 0 && !error && (
-              <Card className="rounded-2xl border-border/70 bg-card/90 shadow-sm animate-fade-in">
-                <CardContent className="p-4">
-                  <p className="font-display text-lg text-foreground tracking-tight">Olá!</p>
-                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                    Posso ajudar com catálogo, prazos e como iniciar sua fórmula. Em caso clínico,
-                    a equipe farmacêutica assume pelo WhatsApp.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
             {error && (
-              <p className="text-destructive text-center text-sm p-2 bg-destructive/15 rounded-xl">
-                {error}
-              </p>
+              <div className="rounded-2xl border border-border/70 bg-card/95 px-3.5 py-3.5 shadow-sm animate-fade-in">
+                <p className="text-sm text-foreground leading-relaxed text-center">{error}</p>
+                <div className="mt-3 flex justify-center">
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="h-8 rounded-full gradient-primary text-xs"
+                    onClick={() =>
+                      openWhatsApp('Olá! Vim pelo chat do site e gostaria de atendimento.')
+                    }
+                  >
+                    Falar no WhatsApp
+                  </Button>
+                </div>
+              </div>
             )}
 
             {messages.map((message) => (
@@ -123,7 +204,7 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
                       : 'bg-card text-foreground border border-border/60 rounded-bl-md'
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.text}</p>
+                  <ChatBubbleText text={message.text} tone={message.sender} />
                   <p
                     className={`text-[10px] mt-1.5 text-right ${
                       message.sender === 'user' ? 'opacity-70' : 'text-muted-foreground'
@@ -138,7 +219,7 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
               </div>
             ))}
 
-            {isTyping && (
+            {streamingText !== null && (
               <div className="flex justify-start gap-2 items-end animate-fade-in">
                 <span
                   className="mb-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10"
@@ -146,19 +227,92 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
                 >
                   <MessageCircle className="h-3.5 w-3.5 text-primary" />
                 </span>
-                <div className="bg-card border border-border/60 rounded-2xl rounded-bl-md px-3.5 py-3 shadow-sm">
-                  <div className="flex space-x-1 items-center">
-                    <div className="w-1.5 h-1.5 bg-primary/70 rounded-full animate-bounce" />
-                    <div className="w-1.5 h-1.5 bg-primary/70 rounded-full animate-bounce [animation-delay:150ms]" />
-                    <div className="w-1.5 h-1.5 bg-primary/70 rounded-full animate-bounce [animation-delay:300ms]" />
+                <div className="max-w-[78%] bg-card border border-border/60 rounded-2xl rounded-bl-md px-3.5 py-2.5 shadow-sm">
+                  {streamingText ? (
+                    <ChatBubbleText text={streamingText} tone="bot" />
+                  ) : (
+                    <div className="flex space-x-1 items-center py-0.5">
+                      <div className="w-1.5 h-1.5 bg-primary/70 rounded-full animate-bounce" />
+                      <div className="w-1.5 h-1.5 bg-primary/70 rounded-full animate-bounce [animation-delay:150ms]" />
+                      <div className="w-1.5 h-1.5 bg-primary/70 rounded-full animate-bounce [animation-delay:300ms]" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {ephemeralError && (
+              <div className="flex justify-start gap-2 items-end animate-fade-in">
+                <span
+                  className="mb-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-destructive/10"
+                  aria-hidden="true"
+                >
+                  <MessageCircle className="h-3.5 w-3.5 text-destructive" />
+                </span>
+                <div className="max-w-[78%] space-y-2 rounded-2xl rounded-bl-md border border-destructive/30 bg-destructive/10 px-3.5 py-2.5">
+                  <p className="text-sm text-destructive leading-relaxed">{ephemeralError}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-8 rounded-full text-xs"
+                      onClick={() => openWhatsApp('Olá! Precisei de ajuda pelo chat do site.')}
+                    >
+                      Abrir WhatsApp
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 rounded-full text-xs"
+                      onClick={dismissEphemeralError}
+                    >
+                      Dispensar
+                    </Button>
                   </div>
                 </div>
               </div>
             )}
+
+            {showQuickReplies && (
+              <div className="flex flex-wrap gap-2 pt-1 animate-fade-in">
+                {QUICK_REPLIES.map((item) => (
+                  <Button
+                    key={item.id}
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="h-8 rounded-full border-border/80 bg-card/90 text-xs font-medium shadow-sm"
+                    onClick={() => {
+                      if ('action' in item && item.action === 'whatsapp') {
+                        openWhatsApp(item.message);
+                        return;
+                      }
+                      if ('text' in item) void sendMessage(item.text);
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
+              </div>
+            )}
+
             <div ref={messagesEndRef} />
           </CardContent>
 
-          <div className="p-3 border-t border-border bg-card">
+          <div className="p-3 border-t border-border bg-card space-y-2">
+            <p className="px-1 text-[11px] text-muted-foreground">
+              Dúvidas clínicas?{' '}
+              <a
+                href={buildWhatsAppUrl('Olá! Gostaria de falar com a equipe farmacêutica.')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-primary underline underline-offset-2"
+              >
+                Fale no WhatsApp
+              </a>
+            </p>
             <div className="flex gap-2">
               <Input
                 value={inputMessage}
@@ -166,13 +320,14 @@ function ChatbotPanel({ onClose, isMinimized, onToggleMinimize }: ChatbotPanelPr
                 onKeyDown={handleKeyPress}
                 placeholder="Digite sua mensagem..."
                 aria-label="Mensagem do chat"
+                disabled={busy || Boolean(error)}
                 className="flex-1 rounded-full border-border bg-input px-3.5 h-10"
               />
               <Button
                 type="button"
                 size="icon"
                 onClick={() => void sendMessage()}
-                disabled={!inputMessage.trim()}
+                disabled={busy || !inputMessage.trim() || Boolean(error)}
                 className="shrink-0 rounded-full gradient-primary hover:brightness-110"
                 aria-label="Enviar mensagem"
               >

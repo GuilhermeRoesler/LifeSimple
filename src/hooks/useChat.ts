@@ -54,16 +54,20 @@ export function useChat(enabled: boolean) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [streamingText, setStreamingText] = useState<string | null>(null);
+  const [ephemeralError, setEphemeralError] = useState<string | null>(null);
   const [authError, setAuthError] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const sendingRef = useRef(false);
+  const abortRef = useRef<AbortController | null>(null);
   const firebase = enabled ? getFirebase() : null;
-  const configError =
+  const setupNotice =
     enabled && !firebase
-      ? 'Configuração do Firebase não encontrada. Verifique o arquivo .env'
+      ? 'Para começar a usar o assistente, configure antes uma chave de API válida e as configurações do Firebase.'
       : '';
-  const error = authError || configError;
+  const error = authError || setupNotice;
 
   useEffect(() => {
     if (!enabled || !firebase) return;
@@ -77,7 +81,9 @@ export function useChat(enabled: boolean) {
           await signInAnonymously(firebase.auth);
         } catch (err) {
           console.error('Erro na autenticação anônima:', err);
-          setAuthError('Falha ao autenticar. O chat não funcionará.');
+          setAuthError(
+            'O assistente ainda não está disponível nesta sessão. Você pode falar conosco pelo WhatsApp.'
+          );
         }
       }
     });
@@ -107,7 +113,9 @@ export function useChat(enabled: boolean) {
       },
       (err) => {
         console.error('Erro ao buscar mensagens:', err);
-        setAuthError('Não foi possível carregar o histórico de mensagens.');
+        setAuthError(
+          'Não foi possível carregar o histórico agora. Tente novamente em instantes ou fale pelo WhatsApp.'
+        );
       }
     );
 
@@ -116,57 +124,102 @@ export function useChat(enabled: boolean) {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, streamingText, ephemeralError, isTyping]);
 
-  const sendMessage = useCallback(async () => {
-    if (!inputMessage.trim() || !firebase?.db || !userId) return;
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, []);
 
-    const db = firebase.db;
-    const messagesCollectionPath = `chats/${userId}/messages`;
-    const text = inputMessage.trim();
-    const history: ChatHistoryItem[] = messages.slice(-12).map((msg) => ({
-      role: msg.sender === 'user' ? 'user' : 'model',
-      text: msg.text,
-    }));
+  const sendMessage = useCallback(
+    async (overrideText?: string) => {
+      if (!firebase?.db || !userId || sendingRef.current) return;
 
-    setInputMessage('');
-    setIsTyping(true);
+      const text = (overrideText ?? inputMessage).trim();
+      if (!text) return;
 
-    try {
-      await addDoc(collection(db, messagesCollectionPath), {
-        text,
-        sender: 'user',
-        timestamp: Timestamp.now(),
-      });
+      const db = firebase.db;
+      const messagesCollectionPath = `chats/${userId}/messages`;
+      const history: ChatHistoryItem[] = messages.slice(-12).map((msg) => ({
+        role: msg.sender === 'user' ? 'user' : 'model',
+        text: msg.text,
+      }));
 
-      const idToken = user ? await user.getIdToken(/* forceRefresh */ false) : null;
-      if (!idToken) {
-        throw new Error('Sessão inválida');
+      sendingRef.current = true;
+      setInputMessage('');
+      setEphemeralError(null);
+      setIsTyping(true);
+      setStreamingText('');
+
+      const controller = new AbortController();
+      abortRef.current?.abort();
+      abortRef.current = controller;
+
+      try {
+        await addDoc(collection(db, messagesCollectionPath), {
+          text,
+          sender: 'user',
+          timestamp: Timestamp.now(),
+        });
+
+        const idToken = user ? await user.getIdToken(false) : null;
+        if (!idToken) {
+          throw new Error('Sessão inválida');
+        }
+
+        const botResponseText = await askAssistant(text, history, idToken, {
+          signal: controller.signal,
+          onChunk: (chunk) => {
+            setStreamingText((prev) => (prev ?? '') + chunk);
+          },
+        });
+
+        await addDoc(collection(db, messagesCollectionPath), {
+          text: botResponseText,
+          sender: 'bot',
+          timestamp: Timestamp.now(),
+        });
+        setStreamingText(null);
+      } catch (err) {
+        if (controller.signal.aborted) {
+          setStreamingText(null);
+          return;
+        }
+        console.error('Erro ao enviar mensagem:', err);
+        setStreamingText(null);
+        const detail =
+          err instanceof Error && err.message
+            ? err.message
+            : `Não consegui responder agora. Tente novamente ou fale conosco pelo WhatsApp: ${PHONE_DISPLAY}.`;
+        setEphemeralError(
+          detail.includes('WhatsApp')
+            ? detail
+            : `${detail} WhatsApp: ${PHONE_DISPLAY}.`
+        );
+      } finally {
+        sendingRef.current = false;
+        setIsTyping(false);
+        if (abortRef.current === controller) {
+          abortRef.current = null;
+        }
       }
-      const botResponseText = await askAssistant(text, history, idToken);
+    },
+    [firebase, inputMessage, messages, user, userId]
+  );
 
-      await addDoc(collection(db, messagesCollectionPath), {
-        text: botResponseText,
-        sender: 'bot',
-        timestamp: Timestamp.now(),
-      });
-    } catch (err) {
-      console.error('Erro ao enviar mensagem:', err);
-      await addDoc(collection(db, messagesCollectionPath), {
-        text: `Não consegui responder agora. Tente novamente ou fale conosco pelo WhatsApp: ${PHONE_DISPLAY}.`,
-        sender: 'bot',
-        timestamp: Timestamp.now(),
-      });
-    } finally {
-      setIsTyping(false);
-    }
-  }, [firebase, inputMessage, messages, user, userId]);
+  const dismissEphemeralError = useCallback(() => {
+    setEphemeralError(null);
+  }, []);
 
   return {
     messages,
     inputMessage,
     setInputMessage,
     isTyping,
+    streamingText,
+    ephemeralError,
+    dismissEphemeralError,
     error,
     messagesEndRef,
     sendMessage,

@@ -12,8 +12,8 @@ description: >-
 
 | Conteúdo | Arquivo |
 |----------|---------|
-| Produtos | `src/data/products.ts` (`initialProducts`, `productNames`) |
-| FAQ | `src/data/faq.ts` |
+| Produtos | `src/data/products.ts` (`initialProducts`, `productNames`, `buildProductCatalogForPrompt`) |
+| FAQ | `src/data/faq.ts` (`faqItems`, `buildFaqForPrompt`) |
 | Contato / mapas / marca | `src/constants/contact.ts` |
 | Tipos | `src/types/index.ts` (`Product`, `ContactForm`) |
 | Links WhatsApp | `src/lib/whatsapp.ts` + `WHATSAPP_NUMBER` |
