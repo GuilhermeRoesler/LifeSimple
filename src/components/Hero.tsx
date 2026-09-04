@@ -15,59 +15,55 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative pt-20 lg:pt-24 min-h-screen flex items-center justify-center text-white overflow-hidden"
+      className="relative min-h-[100svh] flex items-end lg:items-center overflow-hidden text-white"
     >
       <div
-        className="absolute inset-0 bg-cover bg-center scale-105"
+        className="absolute inset-0 bg-cover bg-center animate-ken-burns will-change-transform"
         style={{ backgroundImage: `url(${publicUrl('/background-hero.jpg')})` }}
         aria-hidden="true"
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-dark/90 via-primary/85 to-primary-light/80" />
-      <div className="absolute inset-0 bg-black/35" />
+      <div
+        className="absolute inset-0 bg-gradient-to-r from-primary-dark/88 via-primary-dark/55 to-primary/25"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25"
+        aria-hidden="true"
+      />
 
-      <div className="relative z-10 container mx-auto px-4">
-        <div className="grid grid-cols-1 place-items-center">
-          <div className="animate-fade-in text-center flex flex-col items-center">
-            <p className="text-sm uppercase tracking-[0.2em] text-white/80 mb-4 font-medium">
-              Farmácia de manipulação · Porto Alegre
-            </p>
-            <h1 className="text-5xl lg:text-7xl xl:text-8xl font-light mb-8 leading-tight font-inter">
-              Life Simple
-            </h1>
+      <div className="relative z-10 container mx-auto px-4 pb-16 pt-28 lg:py-32">
+        <div className="max-w-3xl animate-fade-in">
+          <p className="text-xs sm:text-sm uppercase tracking-[0.28em] text-white/80 mb-5 font-medium">
+            Farmácia de manipulação · Porto Alegre
+          </p>
 
-            <p className="text-base lg:text-lg text-gray-100 mb-8 leading-relaxed max-w-3xl font-inter font-normal">
-              Cuidar da sua saúde é a nossa prioridade. Medicamentos, bem-estar e cuidados
-              pessoais com atendimento atencioso, orientação segura e qualidade em cada fórmula.
-            </p>
+          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-medium tracking-tight leading-[0.95] mb-6 drop-shadow-sm">
+            Life Simple
+          </h1>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                onClick={handleWhatsApp}
-                className="gradient-primary hover:opacity-90 transition-opacity"
-              >
-                <MessageCircle className="mr-2 h-5 w-5" />
-                Fale conosco
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={scrollToProducts}
-                className="border-white/80 text-white bg-transparent hover:bg-white hover:text-primary"
-              >
-                Ver Produtos
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
+          <p className="text-base sm:text-lg lg:text-xl text-white/95 leading-relaxed max-w-xl mb-10 font-light">
+            Fórmulas personalizadas com orientação farmacêutica, qualidade em cada dose e
+            atendimento humano do primeiro contato à entrega.
+          </p>
 
-            <div className="mt-12 flex flex-wrap gap-6 justify-center">
-              {['Farmácia Registrada', 'Entrega Rápida', 'Qualidade Garantida'].map((label) => (
-                <div key={label} className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-primary-light" />
-                  <span className="text-sm font-medium">{label}</span>
-                </div>
-              ))}
-            </div>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <Button
+              size="lg"
+              onClick={handleWhatsApp}
+              className="border-0 bg-[linear-gradient(135deg,hsl(175_45%_32%),hsl(175_40%_48%))] text-white hover:opacity-90 transition-all duration-300 h-12 px-7 text-base shadow-lg shadow-black/25"
+            >
+              <MessageCircle className="mr-2 h-5 w-5" />
+              Fale conosco
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={scrollToProducts}
+              className="border-white/80 text-white bg-white/10 backdrop-blur-sm hover:bg-white hover:text-primary-dark h-12 px-7 text-base transition-all duration-300"
+            >
+              Ver produtos
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
         </div>
       </div>

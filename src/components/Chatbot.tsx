@@ -139,10 +139,10 @@ export default function Chatbot() {
           setIsOpen(true);
           setIsMinimized(false);
         }}
-        className="fixed bottom-6 right-6 z-40 h-16 w-16 rounded-full text-primary-foreground gradient-primary flex items-center justify-center hover:opacity-90 transition-all"
+        className="fixed bottom-6 right-6 z-40 h-14 w-14 md:h-16 md:w-16 rounded-full text-primary-foreground gradient-primary flex items-center justify-center hover:opacity-90 hover:scale-105 transition-all duration-300 animate-pulse-soft shadow-lg shadow-primary/30"
         aria-label="Abrir chat"
       >
-        <MessageCircle className="h-8 w-8" />
+        <MessageCircle className="h-7 w-7 md:h-8 md:w-8" />
       </button>
     );
   }

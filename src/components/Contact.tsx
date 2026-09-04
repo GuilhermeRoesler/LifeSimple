@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
 import { ContactForm } from '@/types';
 import {
   BUSINESS_HOURS,
@@ -72,148 +71,70 @@ Aguardo retorno. Obrigado(a)!`;
   };
 
   return (
-    <section id="contato" className="py-12 bg-background">
-      <div className="container mx-auto px-4 md:px-12">
-        <div className="text-center mb-12 animate-fade-in">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">Entre em Contato</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Nossa equipe da Life Simple está pronta para atender você com cuidado e profissionalismo
-          </p>
-        </div>
+    <section id="contato" className="section-pad bg-background">
+      <div className="container mx-auto px-4">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 max-w-6xl mx-auto">
+          <div className="lg:col-span-5 animate-fade-in">
+            <p className="text-xs uppercase tracking-[0.24em] text-primary mb-3 font-medium">
+              Contato
+            </p>
+            <h2 className="section-title text-foreground">Fale com a Life Simple</h2>
+            <p className="section-lead text-muted-foreground">
+              Envie sua mensagem e continue a conversa no WhatsApp com a nossa equipe.
+            </p>
 
-        <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          <div className="animate-slide-up max-w-lg mx-auto w-full">
-            <Card>
-              <CardContent className="p-6">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="nome">Nome *</Label>
-                    <Input
-                      id="nome"
-                      type="text"
-                      required
-                      value={formData.nome}
-                      onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                      placeholder="Seu nome completo"
-                      className="border-black border-gradient-primary mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="email">E-mail *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="seu@email.com"
-                      className="border-black border-gradient-primary mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="telefone">Telefone (opcional)</Label>
-                    <Input
-                      id="telefone"
-                      type="tel"
-                      value={formData.telefone}
-                      onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                      placeholder="(51) 98935-4834"
-                      className="border-black border-gradient-primary mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="mensagem">Mensagem *</Label>
-                    <Textarea
-                      id="mensagem"
-                      required
-                      value={formData.mensagem}
-                      onChange={(e) => setFormData({ ...formData, mensagem: e.target.value })}
-                      placeholder="Como podemos ajudar você?"
-                      rows={4}
-                      className="border-black border-gradient-primary mt-1"
-                    />
-                  </div>
-
-                  <div className="flex items-start space-x-2">
-                    <Checkbox
-                      id="consentimento"
-                      checked={formData.consentimento}
-                      onCheckedChange={(checked) =>
-                        setFormData({ ...formData, consentimento: checked === true })
-                      }
-                    />
-                    <Label htmlFor="consentimento" className="text-sm text-muted-foreground">
-                      Concordo com o processamento dos meus dados pessoais de acordo com a{' '}
-                      <Link to="/privacidade" className="text-primary underline">
-                        Política de Privacidade
-                      </Link>{' '}
-                      e a{' '}
-                      <Link to="/lgpd" className="text-primary underline">
-                        LGPD
-                      </Link>
-                      .
-                    </Label>
-                  </div>
-
-                  {submitMessage && (
-                    <div
-                      className={`p-3 rounded-lg text-sm ${
-                        submitMessage.includes('Redirecionando')
-                          ? 'bg-green-500/10 text-green-600 border border-green-200'
-                          : 'bg-destructive/10 text-destructive'
-                      }`}
-                    >
-                      {submitMessage}
-                    </div>
-                  )}
-
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full gradient-primary hover:opacity-90"
+            <div className="mt-10 space-y-6">
+              <div className="flex gap-4">
+                <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-foreground mb-1">Endereço</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {ADDRESS_LINES.map((line) => (
+                      <span key={line}>
+                        {line}
+                        <br />
+                      </span>
+                    ))}
+                  </p>
+                  <a
+                    href={MAPS_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary text-sm font-medium mt-2 inline-block hover:underline"
                   >
-                    <Send className="mr-2 h-4 w-4" />
-                    {isSubmitting ? 'Abrindo WhatsApp...' : 'Enviar via WhatsApp'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-6 animate-slide-up max-w-lg mx-auto w-full">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Endereço</h3>
-                    <p className="text-muted-foreground">
-                      {ADDRESS_LINES.map((line) => (
-                        <span key={line}>
-                          {line}
-                          <br />
-                        </span>
-                      ))}
-                    </p>
-                    <a
-                      href={MAPS_LINK}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary text-sm underline mt-2 inline-block"
-                    >
-                      Abrir no Google Maps
-                    </a>
-                  </div>
+                    Abrir no Google Maps
+                  </a>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            <div className="rounded-xl overflow-hidden border border-border aspect-video bg-accent">
+              <div className="flex gap-4">
+                <Clock className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-foreground mb-1">Horário</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {BUSINESS_HOURS.weekdays}
+                    <br />
+                    {BUSINESS_HOURS.saturday}
+                    <br />
+                    {BUSINESS_HOURS.sunday}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <Phone className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-foreground mb-1">Canais</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    WhatsApp: {PHONE_DISPLAY}
+                    <br />
+                    E-mail: {EMAIL}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 rounded-2xl overflow-hidden border border-border aspect-[16/10] bg-accent">
               <iframe
                 title="Localização Life Simple no mapa"
                 src={MAPS_EMBED_URL}
@@ -223,44 +144,108 @@ Aguardo retorno. Obrigado(a)!`;
                 allowFullScreen
               />
             </div>
+          </div>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Horário de Funcionamento</h3>
-                    <p className="text-muted-foreground">
-                      {BUSINESS_HOURS.weekdays}
-                      <br />
-                      {BUSINESS_HOURS.saturday}
-                      <br />
-                      {BUSINESS_HOURS.sunday}
-                    </p>
-                  </div>
+          <div className="lg:col-span-7 animate-slide-up">
+            <form
+              onSubmit={handleSubmit}
+              className="rounded-2xl border border-border/80 bg-card p-6 sm:p-8 shadow-[0_20px_50px_-40px_hsl(175_42%_20%/0.5)] space-y-5"
+            >
+              <div className="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <Label htmlFor="nome">Nome *</Label>
+                  <Input
+                    id="nome"
+                    type="text"
+                    required
+                    value={formData.nome}
+                    onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                    placeholder="Seu nome completo"
+                    className="mt-1.5 h-11"
+                  />
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Telefones</h3>
-                    <p className="text-muted-foreground">
-                      WhatsApp: {PHONE_DISPLAY}
-                      <br />
-                      E-mail: {EMAIL}
-                    </p>
-                  </div>
+                <div>
+                  <Label htmlFor="email">E-mail *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="seu@email.com"
+                    className="mt-1.5 h-11"
+                  />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+
+              <div>
+                <Label htmlFor="telefone">Telefone (opcional)</Label>
+                <Input
+                  id="telefone"
+                  type="tel"
+                  value={formData.telefone}
+                  onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                  placeholder="(51) 98935-4834"
+                  className="mt-1.5 h-11"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="mensagem">Mensagem *</Label>
+                <Textarea
+                  id="mensagem"
+                  required
+                  value={formData.mensagem}
+                  onChange={(e) => setFormData({ ...formData, mensagem: e.target.value })}
+                  placeholder="Como podemos ajudar você?"
+                  rows={5}
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <Checkbox
+                  id="consentimento"
+                  checked={formData.consentimento}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, consentimento: checked === true })
+                  }
+                />
+                <Label htmlFor="consentimento" className="text-sm text-muted-foreground leading-relaxed">
+                  Concordo com o processamento dos meus dados pessoais de acordo com a{' '}
+                  <Link to="/privacidade" className="text-primary underline">
+                    Política de Privacidade
+                  </Link>{' '}
+                  e a{' '}
+                  <Link to="/lgpd" className="text-primary underline">
+                    LGPD
+                  </Link>
+                  .
+                </Label>
+              </div>
+
+              {submitMessage && (
+                <div
+                  className={`p-3 rounded-lg text-sm ${
+                    submitMessage.includes('Redirecionando')
+                      ? 'bg-success/10 text-success border border-success/20'
+                      : 'bg-destructive/10 text-destructive'
+                  }`}
+                >
+                  {submitMessage}
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-12 gradient-primary hover:opacity-90 text-base"
+              >
+                <Send className="mr-2 h-4 w-4" />
+                {isSubmitting ? 'Abrindo WhatsApp...' : 'Enviar via WhatsApp'}
+              </Button>
+            </form>
           </div>
         </div>
       </div>

@@ -1,85 +1,57 @@
-import { Phone, Beaker, Truck } from 'lucide-react';
-
 const steps = [
   {
-    icon: Phone,
+    number: '01',
     title: 'Consulta',
-    description: 'Entre em contato conosco pelo WhatsApp ou telefone para discutir suas necessidades.'
+    description: 'Conte seu objetivo pelo WhatsApp. Orientamos com segurança e clareza.',
   },
   {
-    icon: Beaker,
+    number: '02',
     title: 'Formulação',
-    description: 'Nossos farmacêuticos preparam sua fórmula personalizada com máxima qualidade.'
+    description: 'Farmacêuticos preparam a fórmula personalizada com qualidade controlada.',
   },
   {
-    icon: Truck,
+    number: '03',
     title: 'Entrega',
-    description: 'Receba seu produto em casa com rapidez e segurança, pronto para uso.'
-  }
+    description: 'Retire na farmácia ou receba em casa, pronto para o uso orientado.',
+  },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="como-funciona" className="py-12 px-4 md:px-12 bg-accent">
+    <section id="como-funciona" className="section-pad bg-primary-dark text-primary-foreground">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12 animate-fade-in">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Como Funciona
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Processo simples e rápido para você receber seus medicamentos manipulados
+        <div className="max-w-2xl mb-14 md:mb-16 animate-fade-in">
+          <p className="text-xs uppercase tracking-[0.24em] text-primary-light mb-3 font-medium">
+            Processo
+          </p>
+          <h2 className="section-title text-white">Como funciona</h2>
+          <p className="section-lead text-white/75">
+            Três passos simples do primeiro contato à fórmula na sua mão.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {steps.map((step, index) => {
-            const Icon = step.icon;
-            return (
-              <div
-                key={index}
-                className="relative animate-slide-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="bg-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  {/* Step Number */}
-                  <div className="absolute -top-4 -right-4 w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg">
-                    {index + 1}
-                  </div>
+        <ol className="grid md:grid-cols-3 gap-10 md:gap-0">
+          {steps.map((step, index) => (
+            <li
+              key={step.number}
+              className="relative animate-slide-up md:px-8 first:md:pl-0 last:md:pr-0"
+              style={{ animationDelay: `${index * 0.12}s` }}
+            >
+              {index < steps.length - 1 && (
+                <div
+                  className="hidden md:block absolute top-7 right-0 w-px h-[calc(100%-1.75rem)] bg-white/15 translate-x-1/2"
+                  aria-hidden="true"
+                />
+              )}
 
-                  {/* Icon */}
-                  <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Icon className="w-8 h-8 text-primary" />
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                  <p className="text-muted-foreground">{step.description}</p>
-                </div>
-
-                {/* Connector Line */}
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-1/2 right-0 transform translate-x-full -translate-y-1/2">
-                    <svg className="w-8 h-2" viewBox="0 0 32 8">
-                      <path
-                        d="M0 4 L24 4"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeDasharray="4 4"
-                        className="text-border"
-                      />
-                      <path
-                        d="M24 4 L32 4"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="text-primary"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              <p className="font-display text-4xl md:text-5xl text-primary-light/90 mb-4 tracking-tight">
+                {step.number}
+              </p>
+              <h3 className="text-xl font-semibold mb-2 text-white">{step.title}</h3>
+              <p className="text-white/65 leading-relaxed text-[0.95rem]">{step.description}</p>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );

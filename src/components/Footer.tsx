@@ -14,11 +14,11 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-primary text-primary-foreground py-12">
+    <footer className="bg-primary-dark text-primary-foreground py-16">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <div className="grid md:grid-cols-4 gap-10 mb-10">
           <div>
-            <h3 className="text-xl font-bold mb-4">Life Simple</h3>
+            <h3 className="text-xl font-display font-medium mb-4 tracking-tight">Life Simple</h3>
             <p className="text-sm opacity-90">
               Farmácia de manipulação especializada em fórmulas personalizadas para sua saúde e
               bem-estar.

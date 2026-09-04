@@ -2,39 +2,46 @@
 @import "tw-animate-css";
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 210 20% 15%;
-  --primary: 175 40% 45%;
+  --background: 170 25% 98%;
+  --foreground: 200 25% 12%;
+  --primary: 175 42% 38%;
   --primary-foreground: 0 0% 100%;
-  --primary-light: 175 40% 55%;
-  --primary-dark: 175 40% 35%;
-  --secondary: 210 30% 96%;
-  --secondary-foreground: 210 20% 15%;
-  --accent: 210 30% 92%;
-  --accent-foreground: 210 20% 15%;
-  --muted: 210 30% 96%;
-  --muted-foreground: 210 15% 45%;
+  --primary-light: 175 40% 52%;
+  --primary-dark: 175 45% 28%;
+  --secondary: 170 20% 94%;
+  --secondary-foreground: 200 25% 12%;
+  --accent: 168 22% 93%;
+  --accent-foreground: 200 25% 12%;
+  --muted: 170 18% 94%;
+  --muted-foreground: 195 12% 40%;
   --card: 0 0% 100%;
-  --card-foreground: 210 20% 15%;
+  --card-foreground: 200 25% 12%;
   --popover: 0 0% 100%;
-  --popover-foreground: 210 20% 15%;
+  --popover-foreground: 200 25% 12%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   --success: 140 60% 40%;
   --success-foreground: 0 0% 100%;
   --warning: 30 90% 55%;
   --warning-foreground: 0 0% 100%;
-  --border: 210 20% 85%;
-  --input: 210 20% 92%;
-  --ring: 175 40% 45%;
+  --border: 175 15% 86%;
+  --input: 170 18% 92%;
+  --ring: 175 42% 38%;
   --radius: 0.75rem;
-  --gradient-primary: linear-gradient(135deg, hsl(175 40% 45%), hsl(175 40% 55%));
-  --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 30% 96%));
+  --gradient-primary: linear-gradient(135deg, hsl(175 45% 32%), hsl(175 40% 48%));
+  --gradient-hero: linear-gradient(
+    105deg,
+    hsl(175 45% 18% / 0.72) 0%,
+    hsl(175 40% 28% / 0.45) 45%,
+    hsl(175 35% 35% / 0.25) 100%
+  );
+  --gradient-surface: linear-gradient(180deg, hsl(170 25% 98%), hsl(168 22% 94%));
 }
 
 @theme inline {
-  --font-inter: Inter, sans-serif;
-  --font-poppins: Poppins, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: Poppins, ui-sans-serif, sans-serif;
+  --font-display: Fraunces, Georgia, "Times New Roman", serif;
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -73,7 +80,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 
   h1,
@@ -82,21 +89,37 @@
   h4,
   h5,
   h6 {
-    @apply font-poppins;
+    font-family: var(--font-heading);
   }
 }
 
 @layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+
   .animate-fade-in {
-    animation: fade-in 0.5s ease-out;
+    animation: fade-in 0.7s ease-out both;
   }
 
   .animate-slide-up {
-    animation: slide-up 0.5s ease-out;
+    animation: slide-up 0.7s ease-out both;
+  }
+
+  .animate-ken-burns {
+    animation: ken-burns 28s ease-out forwards;
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 2.4s ease-in-out infinite;
   }
 
   .glass-effect {
-    @apply backdrop-blur-md bg-white/80 border border-white/20;
+    @apply backdrop-blur-md bg-white/70 border border-white/25;
   }
 
   .gradient-primary {
@@ -107,15 +130,31 @@
     background: var(--gradient-hero);
   }
 
+  .gradient-surface {
+    background: var(--gradient-surface);
+  }
+
   .border-gradient-primary {
     border-color: hsl(var(--primary));
+  }
+
+  .section-pad {
+    @apply py-20 md:py-28;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl lg:text-[2.75rem] font-semibold tracking-tight;
+  }
+
+  .section-lead {
+    @apply mt-4 text-base md:text-lg leading-relaxed max-w-2xl;
   }
 }
 
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
 
   to {
@@ -127,7 +166,7 @@
 @keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(24px);
   }
 
   to {
@@ -136,6 +175,36 @@
   }
 }
 
+@keyframes ken-burns {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsl(175 42% 38% / 0.45);
+  }
+
+  50% {
+    box-shadow: 0 0 0 14px hsl(175 42% 38% / 0);
+  }
+}
+
 html {
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-ken-burns,
+  .animate-pulse-soft {
+    animation: none;
+  }
 }

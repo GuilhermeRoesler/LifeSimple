@@ -12,9 +12,9 @@ description: >-
 
 - Paleta **verde-água / branco** (`primary` ~ HSL `175 40% 45%`)
 - Tokens em `:root` + `@theme inline` em `src/index.css` — preferir classes semânticas (`bg-primary`, `text-muted-foreground`) a cores soltas
-- Fontes: **Inter** (corpo) e **Poppins** (títulos via utilitários do tema)
+- Fontes: **DM Sans** (corpo), **Poppins** (títulos de seção) e **Fraunces** (marca / display via `.font-display`)
 - Radius base `--radius: 0.75rem`
-- Gradientes: `gradient-primary`, overlays no hero (não inventar tema roxo/escuro genérico)
+- Gradientes: `gradient-primary`, `gradient-hero`, `gradient-surface`; utilitários `.section-pad`, `.section-title`, `.section-lead`
 
 ## Anatomia da landing (`pages/Index.tsx`)
 
