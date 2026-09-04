@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
     process.env.TRUST_PROXY = env.TRUST_PROXY;
   }
 
-  const siteUrl = env.VITE_SITE_URL || "http://localhost:8080";
+  const siteUrl = env.VITE_SITE_URL || "http://localhost:5173";
   // Project pages: /RepoName/ — root/custom domain: /
   const base = env.VITE_BASE_PATH || "/";
 

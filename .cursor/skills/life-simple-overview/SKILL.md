@@ -38,7 +38,7 @@ src/
   components/   # Seções da landing + ui/ (shadcn)
   constants/    # Contatos, mapas, SITE_NAME
   data/         # Catálogo e FAQ
-  hooks/        # useChat
+  hooks/        # useChat, useReveal
   lib/          # format, whatsapp, utils (cn, publicUrl)
   pages/        # Index, legais, 404
   services/     # firebase, gemini (cliente → /api/chat)
@@ -52,13 +52,14 @@ public/         # assets, robots, sitemap
 
 | Comando | Uso |
 |---------|-----|
-| `npm run dev` | Dev + proxy `/api/chat` (porta 8080) |
+| `npm run dev` | Dev + proxy `/api/chat` (porta 5173) |
 | `npm run build` | `tsc -b` + Vite build |
 | `npm run typecheck` | Só TypeScript |
 | `npm run lint` | ESLint |
 | `npm test` | Vitest |
 | `npm run preview` | Preview + proxy |
-| `npm run start` | Serve `dist/` + API (produção local) |
+| `npm run start` | Serve `dist/` + API (produção local; Node 22+) |
+| `npm run optimize:images` | Gera WebP otimizados em `public/` |
 
 ## Env (regras de ouro)
 

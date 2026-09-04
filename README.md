@@ -2,13 +2,14 @@
 
 Landing page one-page responsiva para farmácia de manipulação, com catálogo, FAQ, páginas legais (LGPD), chatbot (Gemini via proxy + Firebase) e conversão via WhatsApp.
 
-![](public/demo.png)
+![](docs/screenshots/demo.png)
 
 ## Funcionalidades
 
 - Design responsivo com identidade verde e branco
 - Catálogo filtrável (Emagrecimento, Academia, Pele) com busca e empty state
 - Modal de produto com CTA WhatsApp
+- Depoimentos e seção “como funciona”
 - Chatbot flutuante (lazy) com histórico, rate limit e chave Gemini só no servidor
 - Formulário de contato → WhatsApp + consentimento LGPD
 - Páginas `/privacidade`, `/termos` e `/lgpd`
@@ -25,7 +26,7 @@ Landing page one-page responsiva para farmácia de manipulação, com catálogo,
 
 ## Como executar
 
-**Pré-requisitos:** Node.js 18+
+**Pré-requisitos:** Node.js 22+ (CI e `npm run start` usam 22; `--experimental-strip-types`).
 
 ```bash
 git clone <repo-url>
@@ -35,13 +36,14 @@ cp .env.example .env
 npm run dev
 ```
 
-Acesse `http://localhost:8080`.
+Acesse `http://localhost:5173` (porta padrão do Vite).
 
 ## Configuração
 
 | Variável | Onde | Descrição |
 |---|---|---|
 | `VITE_SITE_URL` | Cliente / HTML | URL pública (OG, canonical). Sem barra final. |
+| `VITE_BASE_PATH` | Build | Base do Vite (default `/`). Em Pages de projeto: `/NomeDoRepo/` |
 | `GEMINI_API_KEY` | **Servidor** | Chave Gemini — **nunca** use prefixo `VITE_` |
 | `VITE_FIREBASE_*` | Cliente | Config do projeto Firebase |
 | `FIREBASE_PROJECT_ID` | Servidor (opcional) | Project ID para validar ID tokens; default = `VITE_FIREBASE_PROJECT_ID` |
@@ -66,10 +68,11 @@ src/
 ├── components/     # Seções da landing + UI
 ├── constants/      # Contatos e mapas
 ├── data/           # Catálogo e FAQ
-├── hooks/          # useChat
+├── hooks/          # useChat, useReveal
 ├── lib/            # format, whatsapp, utils
 ├── pages/          # Index, legais, 404
 ├── services/       # firebase, gemini (cliente)
+├── types/          # Product, ContactForm
 server/             # Proxy Gemini + servidor de produção
 plugins/            # Plugin Vite /api/chat
 ```
@@ -78,13 +81,14 @@ plugins/            # Plugin Vite /api/chat
 
 | Comando | Descrição |
 |---|---|
-| `npm run dev` | Dev + proxy `/api/chat` |
+| `npm run dev` | Dev + proxy `/api/chat` (porta 5173) |
 | `npm run build` | Typecheck + build |
 | `npm run typecheck` | Só TypeScript (`tsc -b`) |
 | `npm run preview` | Preview do build (com proxy) |
-| `npm run start` | Serve `dist/` + API (produção local) |
+| `npm run start` | Serve `dist/` + API (produção local; Node 22+) |
 | `npm run lint` | ESLint |
 | `npm test` | Vitest |
+| `npm run optimize:images` | Gera WebP otimizados em `public/` |
 
 ## CI/CD (GitHub Actions)
 
