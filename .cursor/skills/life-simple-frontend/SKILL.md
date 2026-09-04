@@ -67,6 +67,7 @@ Ordem fixa:
 
 - Mobile-first; breakpoints Tailwind padrão
 - Imagens decorativas: `aria-hidden` quando aplicável
+- Produtos/hero: WebP otimizado; usar `OptimizedImage` (lazy) ou `priority` no LCP; assets via `publicUrl`
 - Botões/links com texto claro (não só ícone sem label)
 
 ## O que evitar

@@ -31,14 +31,14 @@ UI e server (system prompt do chat) **consomem** esses módulos — não copiar 
   descricao_curta: string;
   descricao_longa: string;
   preco: string;                 // decimal string, ex. "79.90"
-  imagem: string;                // path em public/, ex. "/img/slim.png"
+  imagem: string;                // path em public/, ex. "/img/slim.webp"
 }
 ```
 
 ### Ao adicionar produto
 
 1. Incluir objeto em `initialProducts` na categoria correta
-2. Colocar imagem em `public/img/` e apontar `imagem`
+2. Colocar imagem WebP em `public/img/` (rodar `npm run optimize:images` se a fonte for PNG/JPG) e apontar `imagem`
 3. Garantir que `productNames` (export derivado) continue coerente — o chat lista produtos
 4. Tom: apoio/bem-estar; **sem** alegações clínicas absolutas; reforçar orientação profissional quando fizer sentido
 5. `preco` como string numérica; formatação na UI via `lib/format`

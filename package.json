@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "start": "node --experimental-strip-types server/production.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "optimize:images": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.11",
@@ -42,6 +43,7 @@
     "eslint-plugin-react-hooks": "^7.1.0",
     "eslint-plugin-react-refresh": "^0.5.0",
     "globals": "^17.12.0",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.3.0",
     "tw-animate-css": "^1.2.0",
     "typescript": "^5.9.0",
@@ -52,6 +54,7 @@
   "allowScripts": {
     "@swc/core@1.16.1": true,
     "@firebase/util@1.15.3": true,
-    "protobufjs@7.6.6": true
+    "protobufjs@7.6.6": true,
+    "esbuild@0.28.2": true
   }
 }

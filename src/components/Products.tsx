@@ -15,7 +15,7 @@ import Reveal from '@/components/Reveal';
 import { Product } from '@/types';
 import { initialProducts } from '@/data/products';
 import { filterProductsBySearch, formatPrice } from '@/lib/format';
-import { publicUrl } from '@/lib/utils';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const CATEGORIES = ['Emagrecimento', 'Academia', 'Pele'] as const;
 
@@ -61,13 +61,11 @@ function ProductCarousel({
                   aria-hidden="true"
                 />
 
-                <img
-                  src={publicUrl(product.imagem)}
+                <OptimizedImage
+                  src={product.imagem}
                   alt={product.nome}
                   width={400}
                   height={500}
-                  loading="lazy"
-                  decoding="async"
                   className="absolute inset-0 m-auto h-[78%] w-auto max-w-[70%] object-contain drop-shadow-[0_18px_30px_rgba(20,50,45,0.22)] transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-translate-y-1"
                 />
 

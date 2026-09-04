@@ -13,7 +13,7 @@ import {
 import { Product } from '@/types';
 import { openWhatsApp } from '@/lib/whatsapp';
 import { formatPrice, greetingForNow } from '@/lib/format';
-import { publicUrl } from '@/lib/utils';
+import OptimizedImage from '@/components/OptimizedImage';
 
 interface ProductModalProps {
   product: Product;
@@ -60,13 +60,11 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
             <span className="absolute top-4 left-4 z-10 inline-flex items-center rounded-full border border-primary/15 bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary shadow-sm">
               Life Simple
             </span>
-            <img
-              src={publicUrl(product.imagem)}
+            <OptimizedImage
+              src={product.imagem}
               alt={product.nome}
               width={480}
               height={480}
-              loading="lazy"
-              decoding="async"
               className="relative z-0 mx-auto max-h-72 w-auto object-contain drop-shadow-[0_18px_30px_rgba(20,50,45,0.22)]"
             />
           </div>

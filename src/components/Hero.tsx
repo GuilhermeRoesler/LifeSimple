@@ -1,7 +1,6 @@
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { openWhatsApp } from '@/lib/whatsapp';
-import { scrollToAnchor } from '@/lib/scroll';
 import { publicUrl } from '@/lib/utils';
 
 export default function Hero() {
@@ -10,19 +9,36 @@ export default function Hero() {
   };
 
   const scrollToProducts = () => {
-    scrollToAnchor('#produtos');
+    document.querySelector('#produtos')?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const heroSm = publicUrl('/background-hero-sm.webp');
+  const heroLg = publicUrl('/background-hero.webp');
+  const heroFallback = publicUrl('/background-hero.jpg');
 
   return (
     <section
       id="home"
       className="relative min-h-[100svh] flex items-end lg:items-center overflow-hidden text-white"
     >
-      <div
-        className="absolute inset-0 bg-cover bg-center animate-ken-burns will-change-transform"
-        style={{ backgroundImage: `url(${publicUrl('/background-hero.jpg')})` }}
-        aria-hidden="true"
-      />
+      <picture>
+        <source
+          type="image/webp"
+          srcSet={`${heroSm} 960w, ${heroLg} 1920w`}
+          sizes="100vw"
+        />
+        <img
+          src={heroFallback}
+          alt=""
+          width={1920}
+          height={1080}
+          sizes="100vw"
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover object-center animate-ken-burns will-change-transform"
+          aria-hidden="true"
+        />
+      </picture>
       <div
         className="absolute inset-0 bg-gradient-to-r from-primary-dark/88 via-primary-dark/55 to-primary-dark/15 lg:via-primary-dark/45 lg:to-transparent"
         aria-hidden="true"
