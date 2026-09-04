@@ -1,0 +1,12 @@
+---
+description: Segurança e contrato do chatbot Gemini (proxy, Firebase, rate limit)
+globs: server/**/*,plugins/**/*,src/services/**/*,src/hooks/useChat.ts,src/components/Chatbot.tsx,firestore.rules
+alwaysApply: false
+---
+
+# Chat / API
+
+`POST /api/chat` com Gemini só no servidor, auth Firebase e rate limit.
+
+Ao tocar em chat, proxy, auth ou Firestore: leia e siga
+`.cursor/skills/life-simple-chat-api/SKILL.md`.

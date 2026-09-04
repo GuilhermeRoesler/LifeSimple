@@ -1,0 +1,12 @@
+---
+description: Catálogo, contatos, FAQ e páginas legais — fontes de verdade de conteúdo
+globs: src/data/**/*,src/constants/**/*,src/types/**/*,src/pages/**/*,src/lib/whatsapp.ts,public/sitemap.xml,public/robots.txt
+alwaysApply: false
+---
+
+# Conteúdo e dados
+
+Catálogo estático, contatos e textos legais são fontes únicas — não duplicar.
+
+Ao editar produtos, FAQ, contato, LGPD ou SEO estático: leia e siga
+`.cursor/skills/life-simple-content/SKILL.md`.

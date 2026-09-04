@@ -1,0 +1,11 @@
+---
+description: Visão geral do Life Simple — stack, estrutura e regras de ouro do projeto
+alwaysApply: true
+---
+
+# Life Simple — Overview
+
+Landing one-page de farmácia de manipulação (React 19 + Vite 8 + Tailwind 4 + Firebase + Gemini).
+
+Antes de alterar arquitetura, rotas, deploy, env ou segurança: leia e siga
+`.cursor/skills/life-simple-overview/SKILL.md`.

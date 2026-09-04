@@ -1,0 +1,12 @@
+---
+description: Convenções de UI, componentes e design system do Life Simple
+globs: src/**/*.{ts,tsx,css}
+alwaysApply: false
+---
+
+# Frontend
+
+UI com shadcn/ui, Tailwind 4 (tokens HSL em `src/index.css`), conversão via WhatsApp.
+
+Ao criar/editar componentes, páginas ou estilos: leia e siga
+`.cursor/skills/life-simple-frontend/SKILL.md`.
